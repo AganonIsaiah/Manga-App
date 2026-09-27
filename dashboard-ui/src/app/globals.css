@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  sans-serif;
+}
+
+.navbar-btn {
+  @apply rounded-full px-2 py-1 text-sm
+  cursor-pointer
+  disabled:text-white disabled:bg-black
+    disabled:cursor-default;
+}
+
+.home-view-card {
+  @apply h-[calc(100vh-60px)] w-[500px] bg-red-300 rounded;
+}
+
+.orange-btn {
+  background-color: rgb(238, 161, 107);
+}
