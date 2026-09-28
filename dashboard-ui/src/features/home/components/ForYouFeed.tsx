@@ -6,6 +6,24 @@ import { Bookmark, BookOpen } from "lucide-react";
 import { MangaDetails } from "../home.types";
 import { mockForYouFeed } from "../home.mock-api";
 
+const statusStyles = {
+  ongoing: {
+    dot: "bg-emerald-400",
+    text: "text-emerald-300",
+    label: "Ongoing",
+  },
+  completed: {
+    dot: "bg-sky-400",
+    text: "text-sky-300",
+    label: "Completed",
+  },
+  hiatus: {
+    dot: "bg-amber-400",
+    text: "text-amber-300",
+    label: "Hiatus",
+  },
+} as const;
+
 function ViewCard({ details }: { details: MangaDetails }) {
   const {
     title,
@@ -21,51 +39,71 @@ function ViewCard({ details }: { details: MangaDetails }) {
   } = details;
 
   function MangaDetails() {
-    return (
-      <div className="h-[45%] flex flex-col bg-slate-700">
-        <div className="p-2 border-b border-slate-500">Cover</div>
+    const currentStatus = statusStyles[status];
 
-        <div className="p-2 flex flex-col border-b border-slate-500">
-          <div className="flex justify-between">
-            <div className="text-xl">{title}</div>
-            <div>{status}</div>
+    return (
+      <div className="h-[55%] flex flex-col bg-gray-900  rounded-b">
+        <div className="p-2 border-y border-slate-500">Cover</div>
+
+        <div className="p-4 flex flex-col flex-1 gap-2 border-b border-slate-500 min-h-0">
+          <div className="flex justify-between items-center">
+            <div className="text-2xl font-semibold">{title}</div>
+            <div className="flex items-center justify-center gap-1">
+              <span
+                className={`${currentStatus.dot} w-2 h-2 rounded-full`}
+              ></span>
+              <span className={`text-sm font-medium ${currentStatus.text}`}>
+                {currentStatus.label}
+              </span>
+            </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 text-xs text-secondary font-medium">
             <div>Story: {authors}</div>
             <div>Art: {artists}</div>
           </div>
 
-          <div className="">{genres}</div>
-
-          <div>{description}</div>
-        </div>
-
-        <div className="p-2 border-b border-slate-500 flex items-center justify-between">
-          <div className="flex flex-col">
-            <div>First published</div>
-            <div>{publicationYear}</div>
+          <div className="flex flex-wrap gap-2">
+            {genres.map((genre) => (
+              <span
+                key={genre}
+                className="rounded-md bg-gray-800 px-3 py-1 text-sm text-slate-400"
+              >
+                {genre}
+              </span>
+            ))}
           </div>
 
-          <div className="flex flex-col">
-            <div>Demographic</div>
-            <div>{demographic}</div>
-          </div>
-
-          <div className="flex flex-col">
-            <div>Latest Chapter</div>
-            <div>{recentChapter}</div>
+          <div className="text-sm overflow-y-auto overflow-x-hidden h-[calc(100vh-460px)]">
+            {description}
           </div>
         </div>
 
-        <div className="px-2 flex items-center justify-center flex-1">
-          <button className="w-[70%] orange-btn text-black py-2.5 rounded-md flex items-center justify-center gap-1.5">
-            <BookOpen size={16}/>
+        <div className="py-2 px-6 border-b border-slate-500 flex items-center justify-between text-sm">
+          <div className="flex flex-col">
+            <div className="text-gray-400">First published</div>
+            <div className="font-medium">{publicationYear}</div>
+          </div>
+
+          <div className="flex flex-col">
+            <div className="text-gray-400">Demographic</div>
+            <div className="font-medium">{demographic}</div>
+          </div>
+
+          <div className="flex flex-col">
+            <div className="text-gray-400">Latest Chapter</div>
+            <div className="font-medium">{recentChapter}</div>
+          </div>
+        </div>
+
+        <div className="px-2 h-[80px] flex items-center justify-center gap-3">
+          <button className="w-[70%] h-[40px] orange-btn text-black py-2.5 rounded-md flex items-center justify-center gap-1.5">
+            <BookOpen size={16} />
             <span className="font-medium text-sm">Start reading</span>
           </button>
 
-          <button className="">
-            <Bookmark />
+          <button className="custom-border h-[40px] w-[40px] flex items-center justify-center rounded">
+            <Bookmark size={16} className="text-gray-400" />
           </button>
         </div>
       </div>
@@ -73,8 +111,8 @@ function ViewCard({ details }: { details: MangaDetails }) {
   }
 
   return (
-    <div className="home-view-card flex flex-col">
-      <div className="h-[55%]"> image</div>
+    <div className="home-view-card home-height flex flex-col rounded-lg">
+      <div className="h-[45%]"> image</div>
 
       <MangaDetails />
     </div>
@@ -163,34 +201,36 @@ export default function ForYouFeed() {
   }
 
   return (
-    <div
-      ref={scrollContainerRef}
-      onScroll={handleScroll}
-      className="relative h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto"
-      aria-label="Manga recommendations"
-    >
+    <>
       <div
-        className="relative w-full"
-        style={{ height: itemHeight * loadedCount }}
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="relative h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto rounded-lg"
+        aria-label="Manga recommendations"
       >
-        {visibleItems.map((itemIndex) => {
-          const manga = feedData.details[itemIndex % feedData.details.length];
+        <div
+          className="relative w-full"
+          style={{ height: itemHeight * loadedCount }}
+        >
+          {visibleItems.map((itemIndex) => {
+            const manga = feedData.details[itemIndex % feedData.details.length];
 
-          return (
-            <div
-              key={`${manga.id}-${itemIndex}`}
-              className="absolute left-0 flex w-full snap-start flex-col items-center justify-center gap-3"
-              style={{
-                height: itemHeight,
-                transform: `translateY(${itemIndex * itemHeight}px)`,
-              }}
-            >
-              <ViewCard details={manga} />
-              <p>Scroll for next manga</p>
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={`${manga.id}-${itemIndex}`}
+                className="absolute left-0 flex w-full snap-start flex-col items-center justify-center gap-3"
+                style={{
+                  height: itemHeight,
+                  transform: `translateY(${itemIndex * itemHeight}px)`,
+                }}
+              >
+                <ViewCard details={manga} />
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+      <p className="font-medium text-sm text-gray-400">Scroll for next manga</p>
+    </>
   );
 }

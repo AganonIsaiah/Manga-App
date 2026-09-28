@@ -1,4 +1,7 @@
 // Navbar.tsx
+
+import { Library, Search, Compass, LucideIcon } from "lucide-react";
+
 import { NavState } from "../home.types";
 
 type NavbarProps = {
@@ -6,35 +9,38 @@ type NavbarProps = {
   onNavigate: (state: NavState) => void;
 };
 
-export default function Navbar({
-  navState,
-  onNavigate,
-}: NavbarProps) {
+const navConfig: Record<NavState, { label: string; icon: LucideIcon }> = {
+  profile: { label: "Library", icon: Library },
+  search: { label: "Search", icon: Search },
+  discovery: { label: "For you", icon: Compass },
+};
+
+const navOrder: NavState[] = ["profile", "search", "discovery"];
+
+export default function Navbar({ navState, onNavigate }: NavbarProps) {
+  function renderNavButton(state: NavState) {
+    const { label, icon: Icon } = navConfig[state];
+
+    return (
+      <button
+        key={state}
+        type="button"
+        className="navbar-btn"
+        disabled={navState === state}
+        onClick={() => onNavigate(state)}
+      >
+        <Icon size={16} aria-hidden="true" />
+        <span>{label}</span>
+      </button>
+    );
+  }
+
   return (
-    <div className="flex w-[300px] items-center justify-between rounded-full bg-slate-700 px-3 py-1.5">
-      <button
-        className="navbar-btn"
-        disabled={navState === "profile"}
-        onClick={() => onNavigate("profile")}
-      >
-        Library
-      </button>
-
-      <button
-        className="navbar-btn"
-        disabled={navState === "search"}
-        onClick={() => onNavigate("search")}
-      >
-        Search
-      </button>
-
-      <button
-        className="navbar-btn"
-        disabled={navState === "discovery"}
-        onClick={() => onNavigate("discovery")}
-      >
-        For you
-      </button>
-    </div>
+    <nav
+      aria-label="Home navigation"
+      className="flex w-[330px] items-center justify-between rounded-full bg-gray-900! px-3 py-2 border border-slate-600"
+    >
+      {navOrder.map(renderNavButton)}
+    </nav>
   );
 }
