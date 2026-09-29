@@ -28,7 +28,8 @@ export const mockForYouFeed: MangaApiResponse = {
       publicationYear: "2023",
       status: "ongoing",
       recentChapter: "Chapter 24",
-      coverUrl: "https://placehold.co/600x900/783f5d/ffffff?text=Tea+at+the+Edge+of+Tomorrow",
+      coverUrl:
+        "https://placehold.co/600x900/783f5d/ffffff?text=Tea+at+the+Edge+of+Tomorrow",
     },
     {
       id: "manga-004",
@@ -56,7 +57,8 @@ export const mockForYouFeed: MangaApiResponse = {
       publicationYear: "2025",
       status: "ongoing",
       recentChapter: "Chapter 18",
-      coverUrl: "https://placehold.co/600x900/395b8a/ffffff?text=Paper+Moon+Detective+Club",
+      coverUrl:
+        "https://placehold.co/600x900/395b8a/ffffff?text=Paper+Moon+Detective+Club",
     },
     {
       id: "manga-006",
@@ -70,7 +72,8 @@ export const mockForYouFeed: MangaApiResponse = {
       publicationYear: "2020",
       status: "completed",
       recentChapter: "Chapter 64",
-      coverUrl: "https://placehold.co/600x900/3f3f46/ffffff?text=Graveyard+Shift+Hero",
+      coverUrl:
+        "https://placehold.co/600x900/3f3f46/ffffff?text=Graveyard+Shift+Hero",
     },
     {
       id: "manga-007",
@@ -98,7 +101,8 @@ export const mockForYouFeed: MangaApiResponse = {
       publicationYear: "2022",
       status: "hiatus",
       recentChapter: "Chapter 42",
-      coverUrl: "https://placehold.co/600x900/76523b/ffffff?text=The+Botanist+and+the+Beast",
+      coverUrl:
+        "https://placehold.co/600x900/76523b/ffffff?text=The+Botanist+and+the+Beast",
     },
     {
       id: "manga-009",
@@ -126,7 +130,19 @@ export const mockForYouFeed: MangaApiResponse = {
       publicationYear: "2018",
       status: "completed",
       recentChapter: "Chapter 52",
-      coverUrl: "https://placehold.co/600x900/a46a3f/ffffff?text=Summer+of+Small+Gods",
+      coverUrl:
+        "https://placehold.co/600x900/a46a3f/ffffff?text=Summer+of+Small+Gods",
     },
   ],
 };
+
+export const mockSuggestionPills: string[] = [
+  "Action-packed adventures",
+  "Dark fantasy",
+  "Feel-good romance",
+  "Mystery and suspense",
+  "Slice of life",
+  "Sci-fi worlds",
+  "Sports and competition",
+  "Comedy",
+];

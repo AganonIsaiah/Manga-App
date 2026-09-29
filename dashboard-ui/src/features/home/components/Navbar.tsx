@@ -38,7 +38,7 @@ export default function Navbar({ navState, onNavigate }: NavbarProps) {
   return (
     <nav
       aria-label="Home navigation"
-      className="flex w-[330px] items-center justify-between rounded-full bg-gray-900! px-3 py-2 border border-slate-600"
+      className="primary-border primary-clr flex home-width items-center justify-between rounded-full px-3 py-2"
     >
       {navOrder.map(renderNavButton)}
     </nav>

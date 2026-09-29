@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, BookOpen } from "lucide-react";
+import { Bookmark, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 
 import { MangaDetails } from "../home.types";
 import { mockForYouFeed } from "../home.mock-api";
+
+type ScrollerProps = {
+  activeIndex: number;
+  length: number;
+  onNext: () => void;
+  onPrevious: () => void;
+  onSelect: (index: number) => void;
+};
 
 const statusStyles = {
   ongoing: {
@@ -24,7 +32,7 @@ const statusStyles = {
   },
 } as const;
 
-function ViewCard({ details }: { details: MangaDetails }) {
+function RenderMangaDetails({ details }: { details: MangaDetails }) {
   const {
     title,
     genres,
@@ -35,87 +43,165 @@ function ViewCard({ details }: { details: MangaDetails }) {
     publicationYear,
     status,
     recentChapter,
-    coverUrl,
   } = details;
+  const currentStatus = statusStyles[status];
+  return (
+    <div className="primary-clr h-[50%] flex flex-col rounded-b">
+      <div className="p-4 flex flex-col flex-1 gap-2 border-y border-slate-500 min-h-0">
+        <div className="flex justify-between items-center">
+          <div
+            className="group relative w-[300px] cursor-pointer!"
+            tabIndex={0}
+          >
+            <div className="truncate text-2xl font-semibold">{title}</div>
 
-  function MangaDetails() {
-    const currentStatus = statusStyles[status];
-
-    return (
-      <div className="h-[55%] flex flex-col bg-gray-900  rounded-b">
-        <div className="p-2 border-y border-slate-500">Cover</div>
-
-        <div className="p-4 flex flex-col flex-1 gap-2 border-b border-slate-500 min-h-0">
-          <div className="flex justify-between items-center">
-            <div className="text-2xl font-semibold">{title}</div>
-            <div className="flex items-center justify-center gap-1">
-              <span
-                className={`${currentStatus.dot} w-2 h-2 rounded-full`}
-              ></span>
-              <span className={`text-sm font-medium ${currentStatus.text}`}>
-                {currentStatus.label}
-              </span>
+            <div
+              role="tooltip"
+              className="cursor-pointer! absolute left-0 top-full z-50 mt-2
+      hidden w-max max-w-[300px] rounded-md bg-slate-700
+      px-3 py-2 text-sm font-normal text-white shadow-lg
+      group-hover:block group-focus:block"
+            >
+              {title}
             </div>
           </div>
-
-          <div className="flex gap-3 text-xs text-secondary font-medium">
-            <div>Story: {authors}</div>
-            <div>Art: {artists}</div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {genres.map((genre) => (
-              <span
-                key={genre}
-                className="rounded-md bg-gray-800 px-3 py-1 text-sm text-slate-400"
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
-
-          <div className="text-sm overflow-y-auto overflow-x-hidden h-[calc(100vh-460px)]">
-            {description}
+          <div className="flex items-center justify-center gap-1.25">
+            <span
+              className={`${currentStatus.dot} w-2 h-2 rounded-full`}
+            ></span>
+            <span className={`text-xs font-medium ${currentStatus.text}`}>
+              {currentStatus.label}
+            </span>
           </div>
         </div>
 
-        <div className="py-2 px-6 border-b border-slate-500 flex items-center justify-between text-sm">
-          <div className="flex flex-col">
-            <div className="text-gray-400">First published</div>
-            <div className="font-medium">{publicationYear}</div>
-          </div>
-
-          <div className="flex flex-col">
-            <div className="text-gray-400">Demographic</div>
-            <div className="font-medium">{demographic}</div>
-          </div>
-
-          <div className="flex flex-col">
-            <div className="text-gray-400">Latest Chapter</div>
-            <div className="font-medium">{recentChapter}</div>
-          </div>
+        <div className="flex gap-3 text-xs text-secondary font-medium">
+          <div>Story: {authors}</div>
+          <div>Art: {artists}</div>
         </div>
 
-        <div className="px-2 h-[80px] flex items-center justify-center gap-3">
-          <button className="w-[70%] h-[40px] orange-btn text-black py-2.5 rounded-md flex items-center justify-center gap-1.5">
-            <BookOpen size={16} />
-            <span className="font-medium text-sm">Start reading</span>
-          </button>
+        <div className="flex flex-wrap gap-2">
+          {genres.map((genre) => (
+            <span
+              key={genre}
+              className="rounded-md bg-gray-800 px-3 py-1 text-sm text-slate-400"
+            >
+              {genre}
+            </span>
+          ))}
+        </div>
 
-          <button className="custom-border h-[40px] w-[40px] flex items-center justify-center rounded">
-            <Bookmark size={16} className="text-gray-400" />
-          </button>
+        <div className="text-sm overflow-y-auto overflow-x-hidden h-[calc(100vh-460px)]">
+          {description}
         </div>
       </div>
-    );
-  }
 
+      <div className="py-2 px-6 border-b border-slate-500 flex items-center justify-between text-sm">
+        <div className="flex flex-col">
+          <div className="text-gray-400">First published</div>
+          <div className="font-medium">{publicationYear}</div>
+        </div>
+
+        <div className="flex flex-col">
+          <div className="text-gray-400">Demographic</div>
+          <div className="font-medium">{demographic}</div>
+        </div>
+
+        <div className="flex flex-col">
+          <div className="text-gray-400">Latest Chapter</div>
+          <div className="font-medium">{recentChapter}</div>
+        </div>
+      </div>
+
+      <div className="px-2 h-[80px] flex items-center justify-center gap-3">
+        <button className="orange-btn btn-transitions w-[70%] h-[40px] text-black py-2.5 rounded-md flex items-center justify-center gap-1.5">
+          <BookOpen size={16} />
+          <span className="font-medium text-sm">Start reading</span>
+        </button>
+
+        <button className="btn-transitions primary-border h-[40px] w-[40px] flex items-center justify-center rounded">
+          <Bookmark size={16} className="text-gray-400" />
+        </button>
+      </div>
+    </div>
+  );
+}
+function ViewCard({ details }: { details: MangaDetails }) {
+  const { coverUrl, title } = details;
   return (
     <div className="home-view-card home-height flex flex-col rounded-lg">
-      <div className="h-[45%]"> image</div>
+      <div
+        className="h-[50%] bg-slate-800 bg-cover bg-center"
+        style={coverUrl ? { backgroundImage: `url("${coverUrl}")` } : undefined}
+        role="img"
+        aria-label={`${title} cover`}
+      />
 
-      <MangaDetails />
+      <RenderMangaDetails details={details} />
     </div>
+  );
+}
+
+function Scroller({
+  activeIndex,
+  length,
+  onNext,
+  onPrevious,
+  onSelect,
+}: ScrollerProps) {
+  const pageStart = Math.floor(activeIndex / 5) * 5;
+  const visibleIndexes = Array.from(
+    { length: Math.min(5, length - pageStart) },
+    (_, offset) => pageStart + offset,
+  );
+
+  return (
+    <aside
+      className="absolute top-1/2 left-[calc(50%+235px)] hidden w-16 -translate-y-1/2 flex-col items-center text-slate-400 sm:flex"
+      aria-label="Recommendation scroller"
+    >
+      <button
+        type="button"
+        onClick={onPrevious}
+        className="btn-transitions mb-5 rounded-full p-2 hover:text-white"
+        aria-label="Previous recommendation"
+      >
+        <ChevronUp size={15} aria-hidden="true" />
+      </button>
+
+      <ol className="flex flex-col items-center gap-5">
+        {visibleIndexes.map((index) => {
+          const isActive = index === activeIndex;
+
+          return (
+            <li key={index}>
+              <button
+                type="button"
+                onClick={() => onSelect(index)}
+                className={`btn-transitions min-w-10 font-medium tabular-nums ${
+                  isActive
+                    ? "text-3xl text-orange-300"
+                    : "text-sm text-slate-400 hover:text-white"
+                }`}
+                aria-label={`Go to recommendation ${index + 1}`}
+                aria-current={isActive ? "true" : undefined}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+
+      <button
+        type="button"
+        onClick={onNext}
+        className="btn-transitions mt-5 rounded-full p-2 hover:text-white"
+        aria-label="Next recommendation"
+      >
+        <ChevronDown size={15} aria-hidden="true" />
+      </button>
+    </aside>
   );
 }
 
@@ -127,6 +213,9 @@ export default function ForYouFeed() {
   const [itemHeight, setItemHeight] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
   const [loadedCount, setLoadedCount] = useState(feedData.details.length);
+
+  const absoluteIndex = itemHeight > 0 ? Math.round(scrollTop / itemHeight) : 0;
+  const activeIndex = absoluteIndex % feedData.details.length;
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -160,18 +249,11 @@ export default function ForYouFeed() {
     return { startIndex, endIndex };
   }, [itemHeight, loadedCount, scrollTop]);
 
-  const visibleItems = useMemo(
-    () =>
-      Array.from(
-        {
-          length: Math.max(
-            0,
-            visibleRange.endIndex - visibleRange.startIndex + 1,
-          ),
-        },
-        (_, offset) => visibleRange.startIndex + offset,
-      ),
-    [visibleRange],
+  // Keep every snap target mounted so long jumps can reach their destination.
+  // Only the expensive card contents are virtualized.
+  const loadedIndexes = useMemo(
+    () => Array.from({ length: loadedCount }, (_, index) => index),
+    [loadedCount],
   );
 
   function handleScroll() {
@@ -196,23 +278,63 @@ export default function ForYouFeed() {
     }
   }
 
+  function scrollToAbsoluteIndex(index: number) {
+    const scrollContainer = scrollContainerRef.current;
+
+    if (!scrollContainer || itemHeight === 0) return;
+
+    scrollContainer.scrollTo({
+      top: index * itemHeight,
+      behavior: "smooth",
+    });
+  }
+
+  function handlePrevious() {
+    scrollToAbsoluteIndex(Math.max(0, absoluteIndex - 1));
+  }
+
+  function handleNext() {
+    const nextIndex = absoluteIndex + 1;
+
+    if (nextIndex >= loadedCount) {
+      setLoadedCount((currentCount) => currentCount + feedData.details.length);
+      requestAnimationFrame(() => scrollToAbsoluteIndex(nextIndex));
+      return;
+    }
+
+    scrollToAbsoluteIndex(nextIndex);
+  }
+
+  function handleSelect(index: number) {
+    const cycleStart = absoluteIndex - activeIndex;
+    const targetIndex = cycleStart + index;
+
+    if (targetIndex >= loadedCount) {
+      setLoadedCount((currentCount) => currentCount + feedData.details.length);
+      requestAnimationFrame(() => scrollToAbsoluteIndex(targetIndex));
+      return;
+    }
+
+    scrollToAbsoluteIndex(targetIndex);
+  }
+
   if (feedData.details.length === 0) {
     return <p>No recommendations available.</p>;
   }
 
   return (
-    <>
+    <div className="relative h-full min-h-0 w-full">
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="relative h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto rounded-lg"
+        className="relative mx-auto h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto rounded-lg sm:max-w-[415px]"
         aria-label="Manga recommendations"
       >
         <div
           className="relative w-full"
           style={{ height: itemHeight * loadedCount }}
         >
-          {visibleItems.map((itemIndex) => {
+          {loadedIndexes.map((itemIndex) => {
             const manga = feedData.details[itemIndex % feedData.details.length];
 
             return (
@@ -224,13 +346,24 @@ export default function ForYouFeed() {
                   transform: `translateY(${itemIndex * itemHeight}px)`,
                 }}
               >
-                <ViewCard details={manga} />
+                {itemIndex >= visibleRange.startIndex &&
+                  itemIndex <= visibleRange.endIndex && (
+                    <ViewCard details={manga} />
+                  )}
               </div>
             );
           })}
         </div>
       </div>
-      <p className="font-medium text-sm text-gray-400">Scroll for next manga</p>
-    </>
+      <div>
+        <Scroller
+          activeIndex={activeIndex}
+          length={feedData.details.length}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          onSelect={handleSelect}
+        />
+      </div>
+    </div>
   );
 }
