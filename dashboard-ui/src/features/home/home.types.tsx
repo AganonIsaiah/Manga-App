@@ -1,7 +1,5 @@
 type MangaStatus = "ongoing" | "completed" | "hiatus";
 
-export type NavState = "profile" | "search" | "discovery";
-
 export interface MangaDetails {
   id: string;
   title: string;
