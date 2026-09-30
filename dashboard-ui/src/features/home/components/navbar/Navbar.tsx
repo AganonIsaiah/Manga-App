@@ -4,9 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Library, Search, Compass } from "lucide-react";
 
-type NavbarProps = {
-  activeTab: string;
-};
+import { NavbarProps } from "./navbar.types";
 
 const navConfig = [
   { tab: "library", label: "Library", icon: Library },

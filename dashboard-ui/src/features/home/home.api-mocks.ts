@@ -1,4 +1,5 @@
-import type { MangaApiResponse } from "./home.types";
+import type { MangaApiResponse } from "./home.api-types";
+import { ProfileDetails, ProfileCounts } from "./components/library/library.types";
 
 export const mockForYouFeed: MangaApiResponse = {
   details: [
@@ -11,10 +12,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Shounen",
       authors: ["Haru Nakamura"],
       artists: ["Emi Sato"],
-      publicationYear: "2022",
+      publication_year: "2022",
       status: "hiatus",
-      recentChapter: "Chapter 81",
-      coverUrl: "https://placehold.co/600x900/312044/ffffff?text=Neon+Ronin",
+      recent_chapter: "Chapter 81",
+      cover_url: "https://placehold.co/600x900/312044/ffffff?text=Neon+Ronin",
     },
     {
       id: "manga-003",
@@ -25,10 +26,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Josei",
       authors: ["Mina Fujimoto"],
       artists: ["Yui Arai"],
-      publicationYear: "2023",
+      publication_year: "2023",
       status: "ongoing",
-      recentChapter: "Chapter 24",
-      coverUrl:
+      recent_chapter: "Chapter 24",
+      cover_url:
         "https://placehold.co/600x900/783f5d/ffffff?text=Tea+at+the+Edge+of+Tomorrow",
     },
     {
@@ -40,10 +41,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Shounen",
       authors: ["Daichi Kuroda"],
       artists: ["Sora Ishikawa"],
-      publicationYear: "2021",
+      publication_year: "2021",
       status: "completed",
-      recentChapter: "Chapter 96",
-      coverUrl: "https://placehold.co/600x900/315c45/ffffff?text=Iron+Orchard",
+      recent_chapter: "Chapter 96",
+      cover_url: "https://placehold.co/600x900/315c45/ffffff?text=Iron+Orchard",
     },
     {
       id: "manga-005",
@@ -54,10 +55,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Shoujo",
       authors: ["Nao Hoshino"],
       artists: ["Rika Abe"],
-      publicationYear: "2025",
+      publication_year: "2025",
       status: "ongoing",
-      recentChapter: "Chapter 18",
-      coverUrl:
+      recent_chapter: "Chapter 18",
+      cover_url:
         "https://placehold.co/600x900/395b8a/ffffff?text=Paper+Moon+Detective+Club",
     },
     {
@@ -69,10 +70,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Seinen",
       authors: ["Koji Watanabe"],
       artists: ["Koji Watanabe"],
-      publicationYear: "2020",
+      publication_year: "2020",
       status: "completed",
-      recentChapter: "Chapter 64",
-      coverUrl:
+      recent_chapter: "Chapter 64",
+      cover_url:
         "https://placehold.co/600x900/3f3f46/ffffff?text=Graveyard+Shift+Hero",
     },
     {
@@ -84,10 +85,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Shounen",
       authors: ["Toma Endo"],
       artists: ["Mei Shibata"],
-      publicationYear: "2019",
+      publication_year: "2019",
       status: "ongoing",
-      recentChapter: "Chapter 143",
-      coverUrl: "https://placehold.co/600x900/477b9e/ffffff?text=Cloud+Harbor",
+      recent_chapter: "Chapter 143",
+      cover_url: "https://placehold.co/600x900/477b9e/ffffff?text=Cloud+Harbor",
     },
     {
       id: "manga-008",
@@ -98,10 +99,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Josei",
       authors: ["Chiyo Matsuda"],
       artists: ["Akari Ono"],
-      publicationYear: "2022",
+      publication_year: "2022",
       status: "hiatus",
-      recentChapter: "Chapter 42",
-      coverUrl:
+      recent_chapter: "Chapter 42",
+      cover_url:
         "https://placehold.co/600x900/76523b/ffffff?text=The+Botanist+and+the+Beast",
     },
     {
@@ -113,10 +114,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Seinen",
       authors: ["Kenji Ito", "Mari Kagawa"],
       artists: ["Junpei Okada"],
-      publicationYear: "2024",
+      publication_year: "2024",
       status: "ongoing",
-      recentChapter: "Chapter 31",
-      coverUrl: "https://placehold.co/600x900/7a2929/ffffff?text=Zero+Signal",
+      recent_chapter: "Chapter 31",
+      cover_url: "https://placehold.co/600x900/7a2929/ffffff?text=Zero+Signal",
     },
     {
       id: "manga-010",
@@ -127,10 +128,10 @@ export const mockForYouFeed: MangaApiResponse = {
       demographic: "Shoujo",
       authors: ["Kaede Miyazaki"],
       artists: ["Fumi Tanaka"],
-      publicationYear: "2018",
+      publication_year: "2018",
       status: "completed",
-      recentChapter: "Chapter 52",
-      coverUrl:
+      recent_chapter: "Chapter 52",
+      cover_url:
         "https://placehold.co/600x900/a46a3f/ffffff?text=Summer+of+Small+Gods",
     },
   ],
@@ -146,3 +147,24 @@ export const mockSuggestionPills: string[] = [
   "Sports and competition",
   "Comedy",
 ];
+
+export const mockProfileDetails: ProfileDetails = {
+  name: "Isaiah",
+  username: "aganon33",
+  location: "Canada",
+  date_joined: "June 2026",
+  account_age_months: 3,
+  bio: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis labore at praesentium, eligendi quasi adipisci, dolorem, debitis aspernatur eaque placeat nihil tenetur reprehenderit beatae minus itaque fugit esse voluptatum suscipit.",
+  header:
+    "Here for strange worlds and stories. fqeqwfebqweifubqewufbfuewqibwfbiqewfbuqwieqfewbqewfbbfwquibfiwe",
+  socials: [
+    "https://github.com/AganonIsaiah",
+    "https://www.linkedin.com/in/isaiah-aganon",
+  ],
+};
+
+export const mockProfileCounts: ProfileCounts = {
+  readings_count: 4,
+  bookmarks_count: 10,
+  reviews_count: 200,
+};

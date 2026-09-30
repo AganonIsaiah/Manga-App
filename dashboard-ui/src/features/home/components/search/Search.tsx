@@ -1,13 +1,16 @@
-"use client";
-import { useState } from "react";
-
-import { mockSuggestionPills } from "../../home.mock-api";
+import { mockSuggestionPills } from "../../home.api-mocks";
+import { SearchProps } from "./search.types";
 
 import View1Search from "./View1";
+import View2ListMangas from "./View2";
 
-export default function Search() {
-  const [query, setQuery] = useState("");
-
+export function Search({
+  searchBar,
+  submittedQuery,
+  query,
+  onQueryChange,
+  onClear,
+}: SearchProps) {
   const suggestionPills = mockSuggestionPills;
 
   const queryTokens = query
@@ -24,25 +27,28 @@ export default function Search() {
       ? queryTokens.filter((token) => token !== pill)
       : [...queryTokens, pill];
 
-    setQuery(nextTokens.join(", "));
-  }
-
-  function handleSubmit() {
-    if (!query.trim()) return;
-    // TODO: navigate to /results?q=... or switch to View2
-    console.log("search:", query);
+    onQueryChange(nextTokens.join(", "));
   }
 
   return (
-    <div className="home-height home-width flex flex-col items-center justify-center">
-      <View1Search
-        query={query}
-        onQueryChange={setQuery}
-        onSubmit={handleSubmit}
-        pills={suggestionPills}
-        selectedPills={selectedPills}
-        onPillToggle={togglePill}
-      />
+    <div className="flex w-full flex-col items-center justify-center">
+      {submittedQuery ? (
+        <View2ListMangas
+          query={submittedQuery}
+          onBack={onClear}
+        />
+      ) : (
+        <View1Search
+          searchBar={searchBar}
+          query={query}
+          onQueryChange={onQueryChange}
+          pills={suggestionPills}
+          selectedPills={selectedPills}
+          onPillToggle={togglePill}
+        />
+      )}
     </div>
   );
 }
+
+export default Search;

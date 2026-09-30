@@ -7,7 +7,7 @@ export async function getUserProfile() {
 
 }
 
-export async function getEditsFeed() {
+export async function getSearchFeed() {
 
 }
 

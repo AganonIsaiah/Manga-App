@@ -1,4 +1,13 @@
+
 type MangaStatus = "ongoing" | "completed" | "hiatus";
+
+export type ScrollerProps = {
+  activeIndex: number;
+  length: number;
+  onNext: () => void;
+  onPrevious: () => void;
+  onSelect: (index: number) => void;
+};
 
 export interface MangaDetails {
   id: string;
@@ -9,13 +18,9 @@ export interface MangaDetails {
 
   authors: string[];
   artists: string[];
-  publicationYear: string;
+  publication_year: string;
   status: MangaStatus;
-  recentChapter: string;
+  recent_chapter: string;
 
-  coverUrl?: string;
-};
-
-export interface MangaApiResponse {
-  details: MangaDetails[];
+  cover_url?: string;
 };

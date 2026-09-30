@@ -3,16 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bookmark, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 
-import { MangaDetails } from "../home.types";
-import { mockForYouFeed } from "../home.mock-api";
-
-type ScrollerProps = {
-  activeIndex: number;
-  length: number;
-  onNext: () => void;
-  onPrevious: () => void;
-  onSelect: (index: number) => void;
-};
+import type { MangaDetails, ScrollerProps } from "./for-you-feed.types";
+import { mockForYouFeed } from "../../home.api-mocks";
 
 const statusStyles = {
   ongoing: {
@@ -40,9 +32,9 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
     authors,
     artists,
     demographic,
-    publicationYear,
+    publication_year,
     status,
-    recentChapter,
+    recent_chapter,
   } = details;
   const currentStatus = statusStyles[status];
   return (
@@ -99,7 +91,7 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
       <div className="py-2 px-6 border-b border-slate-500 flex items-center justify-between text-sm">
         <div className="flex flex-col">
           <div className="text-gray-400">First published</div>
-          <div className="font-medium">{publicationYear}</div>
+          <div className="font-medium">{publication_year}</div>
         </div>
 
         <div className="flex flex-col">
@@ -109,7 +101,7 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
 
         <div className="flex flex-col">
           <div className="text-gray-400">Latest Chapter</div>
-          <div className="font-medium">{recentChapter}</div>
+          <div className="font-medium">{recent_chapter}</div>
         </div>
       </div>
 
@@ -127,12 +119,12 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
   );
 }
 function ViewCard({ details }: { details: MangaDetails }) {
-  const { coverUrl, title } = details;
+  const { cover_url, title } = details;
   return (
     <div className="home-view-card home-height flex flex-col rounded-lg">
       <div
         className="h-[50%] bg-slate-800 bg-cover bg-center"
-        style={coverUrl ? { backgroundImage: `url("${coverUrl}")` } : undefined}
+        style={cover_url ? { backgroundImage: `url("${cover_url}")` } : undefined}
         role="img"
         aria-label={`${title} cover`}
       />
