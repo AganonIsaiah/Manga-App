@@ -1,5 +1,8 @@
 import type { MangaApiResponse } from "./home.api-types";
-import { ProfileDetails, ProfileCounts } from "./components/library/library.types";
+import {
+  ProfileDetails,
+  ProfileCounts,
+} from "./components/library/library.types";
 
 export const mockForYouFeed: MangaApiResponse = {
   details: [
@@ -151,15 +154,83 @@ export const mockSuggestionPills: string[] = [
 export const mockProfileDetails: ProfileDetails = {
   name: "Isaiah",
   username: "aganon33",
-  location: "Canada",
   date_joined: "June 2026",
   account_age_months: 3,
-  bio: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis labore at praesentium, eligendi quasi adipisci, dolorem, debitis aspernatur eaque placeat nihil tenetur reprehenderit beatae minus itaque fugit esse voluptatum suscipit.",
+  read_all_time: 42,
+  read_this_year: 18,
+  bio: "Lorem ipsum dolor sit amet co   LoremLorem ipsum dolor sit amet co Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosam neque voluptates nihil iste!Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosam neque voluptates nihil iste!Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosa Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosam neque voluptates nihil iste!m neque voluptates nihil iste!nsectetur adipisicing elit. Reiciendis labore at praesentium, eligendi quasi adipisci, dolorem, debitis aspernatur eaque placeat nihil tenetur reprehenderit beatae minus itaque fugit esse voluptatum suscipit. ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosam neque voluptates nihil iste!Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosam neque voluptates nihil iste!Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosa   Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore expedita autem nam hic, nemo suscipit odio corporis error eos sapiente facilis officiis numquam veniam laboriosam neque voluptates nihil iste!m neque voluptates nihil iste!nsectetur adipisicing elit. Reiciendis labore at praesentium, eligendi quasi adipisci, dolorem, debitis aspernatur eaque placeat nihil tenetur reprehenderit beatae minus itaque fugit esse voluptatum suscipit.",
   header:
     "Here for strange worlds and stories. fqeqwfebqweifubqewufbfuewqibwfbiqewfbuqwieqfewbqewfbbfwquibfiwe",
-  socials: [
-    "https://github.com/AganonIsaiah",
-    "https://www.linkedin.com/in/isaiah-aganon",
+  location: "string",
+  ratings: [10, 3, 5, 7, 2],
+  following: ["paperlantern", "manga_mira", "panelhopper", "inkandtea", "paperlantern", "manga_mira", "panelhopper", "inkandtea", "paperlantern", "manga_mira", "panelhopper", "inkandtea", "paperlantern", "manga_mira", "panelhopper", "inkandtea"],
+  followers: ["kaiju_reader", "shoujo_sky", "noirpanels"],
+  favourite_manga: [
+    {
+      title: "The Ember Knight",
+      cover_url:
+        "https://placehold.co/600x900/7c2d12/ffffff?text=The+Ember+Knight",
+      current_chapter: 84,
+      days_last_read: 2,
+      authors: ["Hwandaeng"],
+    },
+    {
+      title: "Summer of Small Gods",
+      cover_url:
+        "https://placehold.co/600x900/a46a3f/ffffff?text=Summer+of+Small+Gods",
+      current_chapter: 52,
+      days_last_read: 7,
+      authors: ["Kaede Miyazaki"],
+    },
+    {
+      title: "Witch Hat Atelier",
+      cover_url:
+        "https://placehold.co/600x900/334155/ffffff?text=Witch+Hat+Atelier",
+      current_chapter: 76,
+      days_last_read: 21,
+      authors: ["Kamome Shirahama"],
+    },
+    {
+      title: "Frieren: Beyond Journey's End",
+      cover_url:
+        "https://placehold.co/600x900/166534/ffffff?text=Frieren",
+      current_chapter: 140,
+      days_last_read: 30,
+      authors: ["Kanehito Yamada"],
+    },
+  ],
+  recently_read: [
+    {
+      title: "The Ember Knight",
+      cover_url:
+        "https://placehold.co/600x900/7c2d12/ffffff?text=The+Ember+Knight",
+      current_chapter: 84,
+      days_last_read: 1,
+      authors: ["Hwandaeng"],
+    },
+    {
+      title: "Dandadan",
+      cover_url: "https://placehold.co/600x900/581c87/ffffff?text=Dandadan",
+      current_chapter: 169,
+      days_last_read: 33,
+      authors: ["Yukinobu Tatsu"],
+    },
+    {
+      title: "Blue Period",
+      cover_url:
+        "https://placehold.co/600x900/1e3a8a/ffffff?text=Blue+Period",
+      current_chapter: 68,
+      days_last_read: 45,
+      authors: ["Tsubasa Yamaguchi"],
+    },
+    {
+      title: "Chainsaw Man",
+      cover_url:
+        "https://placehold.co/600x900/991b1b/ffffff?text=Chainsaw+Man",
+      current_chapter: 218,
+      days_last_read: 512,
+      authors: ["Tatsuki Fujimoto"],
+    },
   ],
 };
 

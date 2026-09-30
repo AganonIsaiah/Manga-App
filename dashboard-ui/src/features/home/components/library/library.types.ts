@@ -1,9 +1,23 @@
 export type LibraryTab = "readings" | "bookmarks" | "reviews" | "profile";
 
+type ProfileDetailsRatings = [number, number, number, number, number];
+
+type ProfileDetailsReadings = [
+  ProfileReadings,
+  ProfileReadings,
+  ProfileReadings,
+  ProfileReadings,
+];
+
 export type NavbarProps = {
   counts: ProfileCounts;
   activeTab: LibraryTab;
   onTabChange: (tab: LibraryTab) => void;
+};
+
+export type HeaderProps = {
+  profile: ProfileDetails;
+  activeTab: LibraryTab;
 };
 
 export interface ProfileCounts {
@@ -16,7 +30,7 @@ export interface ProfileReadings {
   title: string;
   cover_url: string;
   current_chapter: number;
-  days_last_read: string;
+  days_last_read: number;
   authors: string[];
 }
 
@@ -38,10 +52,22 @@ export interface ProfileMangaReviews {
 export interface ProfileDetails {
   name: string;
   username: string;
-  location: string;
+
+  read_this_year: number;
+  read_all_time: number;
+
   date_joined: string;
   account_age_months: number;
+  location: string;
+
   bio: string;
   header: string;
-  socials?: string[];
+
+  following: string[];
+  followers: string[];
+
+  favourite_manga: ProfileDetailsReadings;
+  recently_read: ProfileDetailsReadings;
+
+  ratings: ProfileDetailsRatings;
 }

@@ -35,7 +35,7 @@ export type InputSearchBarProps = {
   onSubmit: () => void;
 };
 
-type SearchTabProps = {
+export type SearchTabProps = {
   initialQuery: string;
   onNavigate: (query: string) => void;
 };
