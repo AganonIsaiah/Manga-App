@@ -12,7 +12,7 @@ import type {
 import { UserProfileApiResponse } from "../../home.api-types";
 import { mockProfileCounts, mockProfileDetails } from "../../home.api-mocks";
 
-import Details from "./Details";
+import Details from "./profile/Details";
 
 
 function ProfileMangaReviews() {
