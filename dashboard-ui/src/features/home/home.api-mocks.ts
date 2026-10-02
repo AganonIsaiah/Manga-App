@@ -162,11 +162,18 @@ export const mockProfileDetails: ProfileDetails = {
   header:
     "Here for strange worlds and stories. fqeqwfebqweifubqewufbfuewqibwfbiqewfbuqwieqfewbqewfbbfwquibfiwe",
   location: "string",
-  ratings: [10, 3, 5, 7, 2],
+  ratings: {
+    one_star: 10,
+    two_stars: 3,
+    three_stars: 5,
+    four_stars: 7,
+    five_stars: 2,
+    total_ratings: 100
+  },
   following: ["paperlantern", "manga_mira", "panelhopper", "inkandtea", "paperlantern", "manga_mira", "panelhopper", "inkandtea", "paperlantern", "manga_mira", "panelhopper", "inkandtea", "paperlantern", "manga_mira", "panelhopper", "inkandtea"],
   followers: ["kaiju_reader", "shoujo_sky", "noirpanels"],
-  favourite_manga: [
-    {
+  favourite_manga: {
+    manga_1: {
       title: "The Ember Knight",
       cover_url:
         "https://placehold.co/600x900/7c2d12/ffffff?text=The+Ember+Knight",
@@ -174,7 +181,7 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 2,
       authors: ["Hwandaeng"],
     },
-    {
+    manga_2: {
       title: "Summer of Small Gods",
       cover_url:
         "https://placehold.co/600x900/a46a3f/ffffff?text=Summer+of+Small+Gods",
@@ -182,7 +189,7 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 7,
       authors: ["Kaede Miyazaki"],
     },
-    {
+    manga_3: {
       title: "Witch Hat Atelier",
       cover_url:
         "https://placehold.co/600x900/334155/ffffff?text=Witch+Hat+Atelier",
@@ -190,7 +197,7 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 21,
       authors: ["Kamome Shirahama"],
     },
-    {
+    manga_4: {
       title: "Frieren: Beyond Journey's End",
       cover_url:
         "https://placehold.co/600x900/166534/ffffff?text=Frieren",
@@ -198,9 +205,9 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 30,
       authors: ["Kanehito Yamada"],
     },
-  ],
-  recently_read: [
-    {
+  },
+  recently_read: {
+    manga_1: {
       title: "The Ember Knight",
       cover_url:
         "https://placehold.co/600x900/7c2d12/ffffff?text=The+Ember+Knight",
@@ -208,14 +215,14 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 1,
       authors: ["Hwandaeng"],
     },
-    {
+    manga_2: {
       title: "Dandadan",
       cover_url: "https://placehold.co/600x900/581c87/ffffff?text=Dandadan",
       current_chapter: 169,
       days_last_read: 33,
       authors: ["Yukinobu Tatsu"],
     },
-    {
+    manga_3: {
       title: "Blue Period",
       cover_url:
         "https://placehold.co/600x900/1e3a8a/ffffff?text=Blue+Period",
@@ -223,7 +230,7 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 45,
       authors: ["Tsubasa Yamaguchi"],
     },
-    {
+    manga_4: {
       title: "Chainsaw Man",
       cover_url:
         "https://placehold.co/600x900/991b1b/ffffff?text=Chainsaw+Man",
@@ -231,7 +238,7 @@ export const mockProfileDetails: ProfileDetails = {
       days_last_read: 512,
       authors: ["Tatsuki Fujimoto"],
     },
-  ],
+  },
 };
 
 export const mockProfileCounts: ProfileCounts = {

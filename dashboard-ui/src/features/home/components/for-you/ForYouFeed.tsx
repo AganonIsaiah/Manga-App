@@ -118,6 +118,7 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
     </div>
   );
 }
+
 function ViewCard({ details }: { details: MangaDetails }) {
   const { cover_url, title } = details;
   return (
@@ -135,60 +136,28 @@ function ViewCard({ details }: { details: MangaDetails }) {
 }
 
 function Scroller({
-  activeIndex,
-  length,
   onNext,
   onPrevious,
-  onSelect,
 }: ScrollerProps) {
-  const pageStart = Math.floor(activeIndex / 5) * 5;
-  const visibleIndexes = Array.from(
-    { length: Math.min(5, length - pageStart) },
-    (_, offset) => pageStart + offset,
-  );
 
   return (
     <aside
-      className="absolute top-1/2 left-[calc(50%+235px)] hidden w-16 -translate-y-1/2 flex-col items-center text-slate-400 sm:flex"
+      className="absolute top-1/2 left-[calc(50%+205px)] hidden w-16 -translate-y-1/2 flex-col items-center text-slate-400 sm:flex"
       aria-label="Recommendation scroller"
     >
       <button
         type="button"
         onClick={onPrevious}
-        className="btn-transitions mb-5 rounded-full p-2 hover:text-white"
+        className="btn-transitions mb-5 rounded-full p-2 hover:text-white hover:bg-slate-700"
         aria-label="Previous recommendation"
       >
         <ChevronUp size={15} aria-hidden="true" />
       </button>
 
-      <ol className="flex flex-col items-center gap-5">
-        {visibleIndexes.map((index) => {
-          const isActive = index === activeIndex;
-
-          return (
-            <li key={index}>
-              <button
-                type="button"
-                onClick={() => onSelect(index)}
-                className={`btn-transitions min-w-10 font-medium tabular-nums ${
-                  isActive
-                    ? "text-3xl text-orange-300"
-                    : "text-sm text-slate-400 hover:text-white"
-                }`}
-                aria-label={`Go to recommendation ${index + 1}`}
-                aria-current={isActive ? "true" : undefined}
-              >
-                {String(index + 1).padStart(2, "0")}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-
       <button
         type="button"
         onClick={onNext}
-        className="btn-transitions mt-5 rounded-full p-2 hover:text-white"
+        className="btn-transitions mt-5 rounded-full p-2 hover:text-white hover:bg-slate-700"
         aria-label="Next recommendation"
       >
         <ChevronDown size={15} aria-hidden="true" />
@@ -207,7 +176,6 @@ export default function ForYouFeed() {
   const [loadedCount, setLoadedCount] = useState(feedData.details.length);
 
   const absoluteIndex = itemHeight > 0 ? Math.round(scrollTop / itemHeight) : 0;
-  const activeIndex = absoluteIndex % feedData.details.length;
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -241,8 +209,6 @@ export default function ForYouFeed() {
     return { startIndex, endIndex };
   }, [itemHeight, loadedCount, scrollTop]);
 
-  // Keep every snap target mounted so long jumps can reach their destination.
-  // Only the expensive card contents are virtualized.
   const loadedIndexes = useMemo(
     () => Array.from({ length: loadedCount }, (_, index) => index),
     [loadedCount],
@@ -297,19 +263,6 @@ export default function ForYouFeed() {
     scrollToAbsoluteIndex(nextIndex);
   }
 
-  function handleSelect(index: number) {
-    const cycleStart = absoluteIndex - activeIndex;
-    const targetIndex = cycleStart + index;
-
-    if (targetIndex >= loadedCount) {
-      setLoadedCount((currentCount) => currentCount + feedData.details.length);
-      requestAnimationFrame(() => scrollToAbsoluteIndex(targetIndex));
-      return;
-    }
-
-    scrollToAbsoluteIndex(targetIndex);
-  }
-
   if (feedData.details.length === 0) {
     return <p>No recommendations available.</p>;
   }
@@ -319,7 +272,7 @@ export default function ForYouFeed() {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="relative mx-auto h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto rounded-lg sm:max-w-[415px]"
+        className="relative mx-auto h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto scrollbar-none! rounded-lg sm:max-w-[415px]"
         aria-label="Manga recommendations"
       >
         <div
@@ -349,11 +302,8 @@ export default function ForYouFeed() {
       </div>
       <div>
         <Scroller
-          activeIndex={activeIndex}
-          length={feedData.details.length}
           onPrevious={handlePrevious}
           onNext={handleNext}
-          onSelect={handleSelect}
         />
       </div>
     </div>

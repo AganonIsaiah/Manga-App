@@ -2,11 +2,8 @@
 type MangaStatus = "ongoing" | "completed" | "hiatus";
 
 export type ScrollerProps = {
-  activeIndex: number;
-  length: number;
   onNext: () => void;
   onPrevious: () => void;
-  onSelect: (index: number) => void;
 };
 
 export interface MangaDetails {

@@ -10,6 +10,7 @@ import ForYouFeed from "./components/for-you/ForYouFeed";
 import { Search } from "./components/search/Search";
 import Library from "./components/library/Library";
 import Navbar from "./components/navbar/Navbar";
+import { UserProfileApiResponse } from "./home.api-types";
 
 export function InputSearchBar({
   query,
@@ -102,12 +103,14 @@ export default function HomePage() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
+
+
   return (
     <div className="home h-dvh w-full px-2">
       <div className="h-[calc(100vh-50px)] flex flex-col gap-6 items-center justify-center">
         <Navbar activeTab={activeTab} />
 
-        {activeTab === "library" && <Library />}
+        {activeTab === "library" && <Library userProfile={{} as UserProfileApiResponse}/>}
         {activeTab === "search" && (
           <SearchTab
             key={submittedQuery}

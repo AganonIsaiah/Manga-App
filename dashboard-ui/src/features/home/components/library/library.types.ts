@@ -1,13 +1,21 @@
 export type LibraryTab = "readings" | "bookmarks" | "reviews" | "profile";
 
-type ProfileDetailsRatings = [number, number, number, number, number];
+export type ProfileDetailsRatings = {
+  one_star: number;
+  two_stars: number;
+  three_stars: number;
+  four_stars: number;
+  five_stars: number;
 
-type ProfileDetailsReadings = [
-  ProfileReadings,
-  ProfileReadings,
-  ProfileReadings,
-  ProfileReadings,
-];
+  total_ratings: number;
+}
+
+type ProfileDetailsReadings = {
+  manga_1: ProfileReadings;
+  manga_2: ProfileReadings;
+  manga_3: ProfileReadings;
+  manga_4: ProfileReadings;
+}
 
 export type NavbarProps = {
   counts: ProfileCounts;
