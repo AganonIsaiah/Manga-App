@@ -1,10 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useScrollDirection } from "@/src/hooks/useScrollDirection";
 import { Send } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { InputSearchBarProps, SearchTabProps } from "./components/search/search.types";
+import {
+  InputSearchBarProps,
+  SearchTabProps,
+} from "./components/search/search.types";
 
 import ForYouFeed from "./components/for-you/ForYouFeed";
 import { Search } from "./components/search/Search";
@@ -90,6 +94,20 @@ export default function HomePage() {
   const activeTab = tab === "library" || tab === "search" ? tab : "discovery";
   const submittedQuery = searchParams.get("q")?.trim() ?? "";
 
+  const {
+    hidden,
+    onScrollCapture,
+    onWheelCapture,
+    onTouchStartCapture,
+    onTouchMoveCapture,
+    onTouchEndCapture,
+    reveal,
+  } = useScrollDirection(
+    `${activeTab}:${submittedQuery}`,
+    12,
+    activeTab === "discovery",
+  );
+
   function navigateToSearch(query: string) {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -103,14 +121,33 @@ export default function HomePage() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
-
-
   return (
-    <div className="home h-dvh w-full px-2">
-      <div className="h-[calc(100vh-50px)] flex flex-col gap-6 items-center justify-center">
+    <div
+      className="home relative min-h-0 flex-1 w-full px-2"
+      onScrollCapture={onScrollCapture}
+      onWheelCapture={onWheelCapture}
+      onTouchStartCapture={onTouchStartCapture}
+      onTouchMoveCapture={onTouchMoveCapture}
+      onTouchEndCapture={onTouchEndCapture}
+      onTouchCancelCapture={onTouchEndCapture}
+    >
+      <div
+        onFocusCapture={reveal}
+        className={`absolute inset-x-2 top-0 z-50 flex justify-center navbar-transitions ${
+          hidden ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
         <Navbar activeTab={activeTab} />
-
-        {activeTab === "library" && <Library userProfile={{} as UserProfileApiResponse}/>}
+      </div>
+      <div
+        className={`h-full min-h-0 flex flex-col items-center justify-center navbar-transitions
+      ${!hidden ? "pt-16" : ""}
+      ${hidden && activeTab === "library" ? "pt-6" : ""}
+      `}
+      >
+        {activeTab === "library" && (
+          <Library userProfile={{} as UserProfileApiResponse} />
+        )}
         {activeTab === "search" && (
           <SearchTab
             key={submittedQuery}

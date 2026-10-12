@@ -54,6 +54,11 @@ body {
   @apply border-0 h-[0.1px] bg-slate-600;
 }
 
+
+.navbar-transitions {
+  @apply  transition-[opacity,padding-top] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none;
+}
+
 .shared-btns {
   .btn-transitions {
   @apply cursor-pointer transition-all duration-200 ease-in-out hover:brightness-110;
