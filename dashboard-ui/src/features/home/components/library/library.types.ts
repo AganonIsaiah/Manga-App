@@ -8,14 +8,9 @@ export type ProfileDetailsRatings = {
   five_stars: number;
 
   total_ratings: number;
-}
+};
 
-type ProfileDetailsReadings = {
-  manga_1: ProfileReadings;
-  manga_2: ProfileReadings;
-  manga_3: ProfileReadings;
-  manga_4: ProfileReadings;
-}
+type ProfileDetailsReadings = Record<string, ProfileReadings>;
 
 export type NavbarProps = {
   counts: ProfileCounts;

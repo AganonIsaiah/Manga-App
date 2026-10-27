@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useScrollDirection } from "@/src/hooks/useScrollDirection";
 import { Send } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -14,7 +13,7 @@ import ForYouFeed from "./components/for-you/ForYouFeed";
 import { Search } from "./components/search/Search";
 import Library from "./components/library/Library";
 import Navbar from "./components/navbar/Navbar";
-import { UserProfileApiResponse } from "./home.api-types";
+import { HomeProvider } from "./home.context";
 
 export function InputSearchBar({
   query,
@@ -23,7 +22,7 @@ export function InputSearchBar({
 }: InputSearchBarProps) {
   return (
     <form
-      className="my-2 flex w-[520px] max-w-full items-center gap-2 rounded-md px-3 py-2 primary-border max-sm:w-[360px]"
+      className="my-2 flex w-[600px] max-w-full items-center gap-2 rounded-md px-3 py-2 primary-border max-sm:w-[390px]"
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
@@ -34,8 +33,8 @@ export function InputSearchBar({
         type="text"
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
-        aria-label="Search for manga by title, author, or description"
-        placeholder="A dark twisted fantasy, like that kanye album but as a manga..."
+        aria-label="Search manga or readers"
+        placeholder="A title, a story idea, or @username…"
       />
 
       <button
@@ -70,8 +69,8 @@ function SearchTab({ initialQuery, onNavigate }: SearchTabProps) {
 
   return (
     <div
-      className={`home-height home-width flex flex-col items-center gap-6 ${
-        initialQuery ? "justify-start" : "justify-center"
+      className={`h-full min-h-0 w-full overflow-y-auto flex flex-col items-center gap-6 px-2 pb-6 ${
+        initialQuery ? "justify-start" : "justify-start search-landing"
       }`}
     >
       {initialQuery && searchBar}
@@ -94,20 +93,6 @@ export default function HomePage() {
   const activeTab = tab === "library" || tab === "search" ? tab : "discovery";
   const submittedQuery = searchParams.get("q")?.trim() ?? "";
 
-  const {
-    hidden,
-    onScrollCapture,
-    onWheelCapture,
-    onTouchStartCapture,
-    onTouchMoveCapture,
-    onTouchEndCapture,
-    reveal,
-  } = useScrollDirection(
-    `${activeTab}:${submittedQuery}`,
-    12,
-    activeTab === "discovery",
-  );
-
   function navigateToSearch(query: string) {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -122,41 +107,25 @@ export default function HomePage() {
   }
 
   return (
-    <div
-      className="home relative min-h-0 flex-1 w-full px-2"
-      onScrollCapture={onScrollCapture}
-      onWheelCapture={onWheelCapture}
-      onTouchStartCapture={onTouchStartCapture}
-      onTouchMoveCapture={onTouchMoveCapture}
-      onTouchEndCapture={onTouchEndCapture}
-      onTouchCancelCapture={onTouchEndCapture}
-    >
-      <div
-        onFocusCapture={reveal}
-        className={`absolute inset-x-2 top-0 z-50 flex justify-center navbar-transitions ${
-          hidden ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-      >
-        <Navbar activeTab={activeTab} />
+    <HomeProvider>
+      <div className="home relative min-h-0 flex-1 w-full px-2">
+        <div className="absolute inset-x-2 top-0 z-50 flex justify-center">
+          <Navbar activeTab={activeTab} />
+        </div>
+        <div className="h-full min-h-0 flex flex-col items-center justify-center pt-16">
+          {activeTab === "library" && (
+            <Library key={searchParams.get("user") ?? "self"} />
+          )}
+          {activeTab === "search" && (
+            <SearchTab
+              key={submittedQuery}
+              initialQuery={submittedQuery}
+              onNavigate={navigateToSearch}
+            />
+          )}
+          {activeTab === "discovery" && <ForYouFeed />}
+        </div>
       </div>
-      <div
-        className={`h-full min-h-0 flex flex-col items-center justify-center navbar-transitions
-      ${!hidden ? "pt-16" : ""}
-      ${hidden && activeTab === "library" ? "pt-6" : ""}
-      `}
-      >
-        {activeTab === "library" && (
-          <Library userProfile={{} as UserProfileApiResponse} />
-        )}
-        {activeTab === "search" && (
-          <SearchTab
-            key={submittedQuery}
-            initialQuery={submittedQuery}
-            onNavigate={navigateToSearch}
-          />
-        )}
-        {activeTab === "discovery" && <ForYouFeed />}
-      </div>
-    </div>
+    </HomeProvider>
   );
 }

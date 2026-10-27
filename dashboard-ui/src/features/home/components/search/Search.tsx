@@ -1,4 +1,4 @@
-import { mockSuggestionPills } from "../../home.api-mocks";
+import { useHome } from "../../home.context";
 import { SearchProps } from "./search.types";
 
 import View1Search from "./View1";
@@ -11,7 +11,7 @@ export function Search({
   onQueryChange,
   onClear,
 }: SearchProps) {
-  const suggestionPills = mockSuggestionPills;
+  const { suggestions: suggestionPills } = useHome();
 
   const queryTokens = query
     .split(",")
@@ -33,10 +33,7 @@ export function Search({
   return (
     <div className="flex w-full flex-col items-center justify-center">
       {submittedQuery ? (
-        <View2ListMangas
-          query={submittedQuery}
-          onBack={onClear}
-        />
+        <View2ListMangas query={submittedQuery} onBack={onClear} />
       ) : (
         <View1Search
           searchBar={searchBar}

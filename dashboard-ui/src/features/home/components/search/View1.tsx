@@ -45,14 +45,15 @@ export default function View1Search({
   return (
     <div className="flex flex-col gap-6 items-center justify-center">
       <div className="flex flex-col items-center justify-center gap-3">
-        <h1 className="text-4xl font-semibold text-center">
+        <h1 className="text-3xl sm:text-4xl font-semibold text-center">
           What Do You Want to Read?
         </h1>
-        <p className="text-gray-400">
-          Search a title or author, describe a story...
+        <p className="text-gray-400 text-center text-sm">
+          Find a story, describe a world, or look up a reader.
         </p>
       </div>
 
+      <p className="eyebrow">A NEW CHAPTER STARTS HERE</p>
       {searchBar}
 
       <SuggestionPills

@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Library, Search, Compass } from "lucide-react";
+import { Library, Search, Compass, LogIn } from "lucide-react";
+
+import { useAuthUsername } from "../../../auth/useAuth";
 
 import { NavbarProps } from "./navbar.types";
 
@@ -13,6 +15,7 @@ const navConfig = [
 ];
 
 export default function Navbar({ activeTab }: NavbarProps) {
+  const username = useAuthUsername();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -24,17 +27,23 @@ export default function Navbar({ activeTab }: NavbarProps) {
       {navConfig.map(({ tab, label, icon: Icon }) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set("tab", tab);
+        params.delete("user");
 
+        const isSignIn = tab === "library" && !username;
+        const NavIcon = isSignIn ? LogIn : Icon;
+        const href = isSignIn
+          ? "/login?next=%2Fhome%3Ftab%3Dlibrary"
+          : `${pathname}?${params.toString()}`;
         return (
           <Link
             key={tab}
-            href={`${pathname}?${params.toString()}`}
+            href={href}
             scroll={false}
             className="navbar-btn"
             aria-current={activeTab === tab ? "page" : undefined}
           >
-            <Icon size={16} aria-hidden="true" />
-            <span>{label}</span>
+            <NavIcon size={16} aria-hidden="true" />
+            <span>{isSignIn ? "Sign in" : label}</span>
           </Link>
         );
       })}

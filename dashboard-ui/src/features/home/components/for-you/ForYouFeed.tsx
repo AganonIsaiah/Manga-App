@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import type { MangaDetails, ScrollerProps } from "./for-you-feed.types";
-import { mockForYouFeed } from "../../home.api-mocks";
+import { useHome } from "../../home.context";
+
+import { MangaActions } from "../MangaCard";
 
 const statusStyles = {
   ongoing: {
@@ -38,14 +40,14 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
   } = details;
   const currentStatus = statusStyles[status];
   return (
-    <div className="primary-clr h-[50%] flex flex-col rounded-b">
+    <div className="primary-clr min-h-0 flex-1 flex flex-col rounded-b">
       <div className="p-4 flex flex-col flex-1 gap-2 border-y border-slate-500 min-h-0">
         <div className="flex justify-between items-center">
           <div
-            className="group relative w-[300px] cursor-pointer!"
+            className="group relative min-w-0 flex-1 pr-3 cursor-pointer!"
             tabIndex={0}
           >
-            <div className="truncate text-2xl font-semibold">{title}</div>
+            <div className="truncate text-xl font-semibold">{title}</div>
 
             <div
               role="tooltip"
@@ -68,8 +70,8 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
         </div>
 
         <div className="flex gap-3 text-xs text-secondary font-medium">
-          <div>Story: {authors}</div>
-          <div>Art: {artists}</div>
+          <div>Story: {authors.join(", ")}</div>
+          <div>Art: {artists.join(", ")}</div>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -83,12 +85,12 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
           ))}
         </div>
 
-        <div className="text-sm overflow-y-auto overflow-x-hidden h-[calc(100vh-460px)]">
+        <div className="text-sm text-slate-300 overflow-y-auto overflow-x-hidden min-h-12 flex-1 leading-relaxed">
           {description}
         </div>
       </div>
 
-      <div className="py-2 px-6 border-b border-slate-500 flex items-center justify-between text-sm">
+      <div className="py-2 px-3 border-b border-slate-500 flex items-center justify-between text-sm">
         <div className="flex flex-col">
           <div className="text-gray-400">First published</div>
           <div className="font-medium">{publication_year}</div>
@@ -105,16 +107,7 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
         </div>
       </div>
 
-      <div className="px-2 h-[80px] flex items-center justify-center gap-3">
-        <button className="orange-btn btn-transitions w-[70%] h-[40px] text-black py-2.5 rounded-md flex items-center justify-center gap-1.5">
-          <BookOpen size={16} />
-          <span className="font-medium text-sm">Start reading</span>
-        </button>
-
-        <button className="btn-transitions primary-border h-[40px] w-[40px] flex items-center justify-center rounded">
-          <Bookmark size={16} className="text-gray-400" />
-        </button>
-      </div>
+      <div className="p-3"><MangaActions manga={details}/></div>
     </div>
   );
 }
@@ -122,9 +115,9 @@ function RenderMangaDetails({ details }: { details: MangaDetails }) {
 function ViewCard({ details }: { details: MangaDetails }) {
   const { cover_url, title } = details;
   return (
-    <div className="home-view-card home-height flex flex-col rounded-lg">
+    <div className="home-view-card h-full flex flex-col rounded-lg my-3">
       <div
-        className="h-[50%] bg-slate-800 bg-cover bg-center"
+        className="h-[42%] shrink-0 bg-slate-800 bg-cover bg-center"
         style={cover_url ? { backgroundImage: `url("${cover_url}")` } : undefined}
         role="img"
         aria-label={`${title} cover`}
@@ -169,7 +162,10 @@ function Scroller({
 export default function ForYouFeed() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isAddingItemsRef = useRef(false);
-  const feedData = mockForYouFeed;
+  const pendingIndexRef = useRef<number | null>(null);
+  const itemHeightRef = useRef(0);
+  const { recommendations } = useHome();
+  const feedData = { details: recommendations };
 
   const [itemHeight, setItemHeight] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
@@ -182,13 +178,47 @@ export default function ForYouFeed() {
 
     if (!scrollContainer) return;
 
+    let settleTimer: number | undefined;
+    const supportsScrollEnd = "onscrollend" in scrollContainer;
+
+    function settleScroll() {
+      const height = scrollContainer!.clientHeight || itemHeightRef.current;
+      if (!height) return;
+      window.clearTimeout(settleTimer);
+      const index = pendingIndexRef.current ??
+        Math.round(scrollContainer!.scrollTop / height);
+      pendingIndexRef.current = null;
+      const top = Math.max(0, index) * height;
+      // A viewport resize can make the original pixel destination stale;
+      // finish at the same card's new position.
+      if (Math.abs(scrollContainer!.scrollTop - top) > 1) {
+        scrollContainer!.scrollTo({ top, behavior: "instant" });
+      }
+    }
+
+    function scheduleSettle() {
+      if (supportsScrollEnd) return;
+      window.clearTimeout(settleTimer);
+      // Fallback for browsers without scrollend; also waits for resizing to stop.
+      settleTimer = window.setTimeout(settleScroll, 120);
+    }
+
     const resizeObserver = new ResizeObserver(([entry]) => {
+      itemHeightRef.current = entry.contentRect.height;
       setItemHeight(entry.contentRect.height);
+      scheduleSettle();
     });
 
     resizeObserver.observe(scrollContainer);
+    scrollContainer.addEventListener("scroll", scheduleSettle);
+    scrollContainer.addEventListener("scrollend", settleScroll);
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      resizeObserver.disconnect();
+      window.clearTimeout(settleTimer);
+      scrollContainer.removeEventListener("scroll", scheduleSettle);
+      scrollContainer.removeEventListener("scrollend", settleScroll);
+    };
   }, []);
 
   const visibleRange = useMemo(() => {
@@ -241,18 +271,21 @@ export default function ForYouFeed() {
 
     if (!scrollContainer || itemHeight === 0) return;
 
+    pendingIndexRef.current = index;
     scrollContainer.scrollTo({
-      top: index * itemHeight,
-      behavior: "smooth",
+      top: index * (scrollContainer.clientHeight || itemHeight),
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
     });
   }
 
   function handlePrevious() {
-    scrollToAbsoluteIndex(Math.max(0, absoluteIndex - 1));
+    scrollToAbsoluteIndex(Math.max(0, (pendingIndexRef.current ?? absoluteIndex) - 1));
   }
 
   function handleNext() {
-    const nextIndex = absoluteIndex + 1;
+    const nextIndex = (pendingIndexRef.current ?? absoluteIndex) + 1;
 
     if (nextIndex >= loadedCount) {
       setLoadedCount((currentCount) => currentCount + feedData.details.length);
@@ -274,22 +307,16 @@ export default function ForYouFeed() {
         onScroll={handleScroll}
         className="relative mx-auto h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto scrollbar-none! rounded-lg sm:max-w-[415px]"
         aria-label="Manga recommendations"
+        data-recommendation-feed
       >
-        <div
-          className="relative w-full"
-          style={{ height: itemHeight * loadedCount }}
-        >
+        <div className="relative h-full w-full">
           {loadedIndexes.map((itemIndex) => {
             const manga = feedData.details[itemIndex % feedData.details.length];
 
             return (
               <div
                 key={`${manga.id}-${itemIndex}`}
-                className="absolute left-0 flex w-full snap-start flex-col items-center justify-center gap-3"
-                style={{
-                  height: itemHeight,
-                  transform: `translateY(${itemIndex * itemHeight}px)`,
-                }}
+                className="relative flex h-full w-full shrink-0 snap-start flex-col items-center justify-center gap-3"
               >
                 {itemIndex >= visibleRange.startIndex &&
                   itemIndex <= visibleRange.endIndex && (
