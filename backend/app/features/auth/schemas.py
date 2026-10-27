@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
@@ -6,6 +8,13 @@ class SignupRequest(BaseModel):
     username: str = Field(pattern=r"^[a-zA-Z0-9_]{3,24}$")
     email: EmailStr = Field(max_length=254)
     password: str = Field(min_length=12, max_length=256)
+    country_code: str | None = Field(default=None, pattern=r"^[A-Z]{2}$")
+    city: str | None = Field(default=None, max_length=100)
+
+    @field_validator("country_code", "city", mode="before")
+    @classmethod
+    def optional_location(cls, value):
+        return value.strip() or None if isinstance(value, str) else value
 
     @field_validator("name", "username", "email", mode="before")
     @classmethod
@@ -24,6 +33,10 @@ class UserResponse(BaseModel):
     id: str
     name: str
     username: str
+    created_at: datetime
+    country_code: str | None = None
+    city: str | None = None
+    avatar_url: str | None = None
 
 
 class SessionResponse(BaseModel):

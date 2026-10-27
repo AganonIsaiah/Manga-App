@@ -4,12 +4,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import uvicorn
+from fastapi import HTTPException, Response
 from sqlalchemy import create_engine
 
 from app.core.config import Settings
 from app.db.session import Base
 from app.features.auth.schemas import SignupRequest
 from app.main import create_app
+from tests.storage_mocks import StorageMock
 from tests.supabase_mocks import SupabaseMock
 
 
@@ -43,6 +45,16 @@ def test_app():
         frontend_url="http://127.0.0.1:3100",
     )
     app = create_app(settings, engine, provider, provider.resolve_email)
+    storage = StorageMock()
+    app.state.avatar_storage = storage
+    provider.settings.supabase_url = "http://127.0.0.1:8101"
+
+    @app.get("/storage/v1/object/public/avatars/{path:path}")
+    def avatar(path: str):
+        if path not in storage.objects:
+            raise HTTPException(404)
+        return Response(content=storage.objects[path], media_type="image/webp")
+
     app.state.test_directory = directory
     return app
 

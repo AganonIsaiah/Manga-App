@@ -1,0 +1,3 @@
+# Install the pinned backend and test dependencies from the existing lock file.
+# Keep versions in requirements.lock to avoid maintaining duplicate dependency lists.
+-r requirements.lock

@@ -53,7 +53,13 @@ def session_info(db, provider, token):
     if not profile:
         raise HTTPException(503, "Your profile is unavailable. Please try again later.")
     return {
-        "user": {"id": str(profile.id), "name": profile.display_name, "username": profile.username},
+        "user": {
+            "id": str(profile.id), "name": profile.display_name, "username": profile.username,
+            "created_at": profile.created_at,
+            "country_code": profile.country_code, "city": profile.city,
+            "avatar_url": (f"{provider.settings.supabase_url}/storage/v1/object/public/avatars/"
+                           f"{profile.avatar_path}" if profile.avatar_path else None),
+        },
         "expiresAt": verified_expiry(token),
     }
 

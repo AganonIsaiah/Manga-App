@@ -26,16 +26,32 @@ export class ConfirmEmail {
   readonly icons = Icons;
   readonly token =
     new URLSearchParams(this.route.snapshot.fragment ?? "").get("token_hash") ??
+    this.route.snapshot.queryParamMap.get("token_hash") ??
     "";
   readonly pending = signal(false);
   readonly complete = signal(false);
   readonly error = signal("");
   constructor() {
-    if (this.route.snapshot.fragment)
+    const fragment = new URLSearchParams(this.route.snapshot.fragment ?? "");
+    if (fragment.has("error") || this.route.snapshot.queryParamMap.has("error"))
+      this.error.set(
+        "This confirmation link has expired or has already been used. Try signing in if you already confirmed your email.",
+      );
+    if (
+      this.route.snapshot.fragment ||
+      this.route.snapshot.queryParamMap.has("token_hash")
+    )
       void this.router.navigate([], {
         relativeTo: this.route,
         replaceUrl: true,
         fragment: undefined,
+        queryParams: {
+          token_hash: null,
+          error: null,
+          error_description: null,
+          error_code: null,
+        },
+        queryParamsHandling: "merge",
       });
   }
   confirm() {

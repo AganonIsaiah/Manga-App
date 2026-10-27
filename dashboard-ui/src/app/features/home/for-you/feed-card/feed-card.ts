@@ -50,7 +50,9 @@ export class FeedCard {
   );
   readonly statisticsDescription = computed(() => {
     const score = this.rating();
-    return score === null ? "Not rated." : `Community rating ${score.toFixed(1)} out of 10.`;
+    return score === null
+      ? "Not rated."
+      : `Community rating ${score.toFixed(1)} out of 10.`;
   });
   readonly icons = Icons;
   private readonly injector = inject(Injector);

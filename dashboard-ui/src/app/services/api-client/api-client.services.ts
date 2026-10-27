@@ -11,6 +11,9 @@ import {
 export class ApiClient {
   private readonly config = inject(API_CONFIG);
   private readonly http = inject(HttpClient);
+  assetJson<T>(path: string): Observable<T> {
+    return this.http.get<T>(path);
+  }
   requestJson<T>(path: string, options: ApiRequestOptions = {}): Observable<T> {
     return defer(() =>
       this.http.request<T>(
@@ -20,7 +23,7 @@ export class ApiClient {
           body: options.body,
           withCredentials: true,
           headers:
-            options.body === undefined
+            options.body === undefined || options.body instanceof Blob
               ? { Accept: "application/json", "X-Manga-Client": "web" }
               : {
                   Accept: "application/json",

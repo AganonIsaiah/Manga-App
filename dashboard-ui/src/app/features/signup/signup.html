@@ -16,7 +16,7 @@
         Create an account to build your library and find your next read.
       </p>
       @if (message()) {
-      <p class="auth-message" role="status">{{ message() }}</p>
+      <p class="auth-message mb-5" role="status">{{ message() }}</p>
       <a
         class="action-primary auth-submit"
         routerLink="/login"
@@ -78,6 +78,37 @@
               [formControl]="form.controls.email"
               (input)="clearMessages()"
           /></label>
+          <div class="auth-location-fields">
+            <manga-searchable-select
+              inputId="signup-country"
+              label="Country (optional)"
+              placeholder="Search countries"
+              [options]="countries"
+              [value]="form.controls.country_code.value"
+              [disabled]="pending()"
+              (selected)="form.controls.country_code.setValue($event)"
+            />
+            <manga-searchable-select
+              inputId="signup-city"
+              label="City (optional)"
+              [placeholder]="form.controls.country_code.value ? 'Search cities' : 'Choose a country first'"
+              [options]="cities()"
+              [value]="form.controls.city.value"
+              [allowCustom]="true"
+              [loading]="citiesLoading()"
+              [disabled]="pending() || !form.controls.country_code.value"
+              (selected)="form.controls.city.setValue($event)"
+            />
+          </div>
+          <p class="text-xs text-slate-500">
+            Your location stays private. Can’t find your city? Type its name to
+            use it.
+          </p>
+          @if(citiesError()){
+          <p class="text-xs text-slate-400" role="status">
+            City suggestions couldn’t load. You can still type your city.
+          </p>
+          }
           <div>
             <label class="auth-label" for="signup-password">Password</label>
             <div class="auth-password">

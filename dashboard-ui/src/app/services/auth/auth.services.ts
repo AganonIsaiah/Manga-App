@@ -6,11 +6,12 @@ import {
   catchError,
   defer,
   finalize,
+  filter,
+  exhaustMap,
   fromEvent,
   map,
   of,
   shareReplay,
-  switchMap,
   tap,
   throwError,
   timer,
@@ -24,6 +25,7 @@ import {
 } from "../../mocks/auth-mocks";
 import type {
   AuthSession,
+  AuthUser,
   LoginCredentials,
   SignupCredentials,
 } from "../../models/auth.model";
@@ -43,6 +45,8 @@ export class AuthService {
   readonly username = computed(() => this.session()?.user.username ?? null);
   private refreshRequest?: Observable<AuthSession>;
   private sessionGeneration = 0;
+  private restoreRequest?: Observable<AuthSession | null>;
+  private lastSessionCheck = 0;
   get useMocks() {
     return this.config.useMocks;
   }
@@ -80,9 +84,13 @@ export class AuthService {
     if (this.browser.window)
       fromEvent(this.browser.window, "focus")
         .pipe(
-          switchMap(() =>
-            this.useMocks ? of(this.session()) : this.restore(),
+          filter(
+            () =>
+              !this.useMocks &&
+              !!this.session() &&
+              Date.now() - this.lastSessionCheck >= 60_000,
           ),
+          exhaustMap(() => this.restore()),
           takeUntilDestroyed(),
         )
         .subscribe();
@@ -94,16 +102,20 @@ export class AuthService {
   restore(): Observable<AuthSession | null> {
     if (this.useMocks) return of(this.session());
     return defer(() => {
+      if (this.restoreRequest) return this.restoreRequest;
       const generation = this.sessionGeneration;
-      return this.api.requestJson<AuthSession>("/auth/session").pipe(
+      const request = this.api.requestJson<AuthSession>("/auth/session").pipe(
         catchError((error) =>
           error instanceof ApiError && error.status === 401
-            ? this.refresh()
+            ? generation === this.sessionGeneration
+              ? this.refresh()
+              : of(null)
             : throwError(() => error),
         ),
         tap((session) => {
           if (generation === this.sessionGeneration) {
             this.sessionValue.set(session);
+            this.lastSessionCheck = Date.now();
             this.errorValue.set("");
           }
         }),
@@ -118,7 +130,14 @@ export class AuthService {
           }
           return of(null);
         }),
+        finalize(() => {
+          if (this.restoreRequest === request) this.restoreRequest = undefined;
+        }),
+        // Finish even if a caller unsubscribes during a refresh-token rotation.
+        shareReplay({ bufferSize: 1, refCount: false }),
       );
+      this.restoreRequest = request;
+      return request;
     });
   }
   refresh(): Observable<AuthSession> {
@@ -128,8 +147,10 @@ export class AuthService {
         .requestJson<AuthSession>("/auth/refresh", { method: "POST", body: {} })
         .pipe(
           tap((session) => {
-            if (generation === this.sessionGeneration)
+            if (generation === this.sessionGeneration) {
               this.sessionValue.set(session);
+              this.lastSessionCheck = Date.now();
+            }
           }),
           finalize(() => {
             if (this.refreshRequest === request)
@@ -147,6 +168,7 @@ export class AuthService {
   ): Observable<AuthSession> {
     return defer(() => {
       ++this.sessionGeneration;
+      this.restoreRequest = undefined;
       this.refreshRequest = undefined;
       return this.useMocks
         ? mockSignIn(credentials).pipe(
@@ -162,9 +184,29 @@ export class AuthService {
     }).pipe(
       tap((session) => {
         this.sessionValue.set(session);
+        this.lastSessionCheck = Date.now();
         this.errorValue.set("");
       }),
     );
+  }
+  uploadAvatar(file: File): Observable<AuthUser> {
+    return defer(() => {
+      const generation = this.sessionGeneration;
+      const userId = this.session()?.user.id;
+      return this.api
+        .requestJson<AuthUser>("/users/me/avatar", {
+          method: "POST",
+          body: file,
+        })
+        .pipe(
+          tap((user) => {
+            if (generation === this.sessionGeneration && userId === user.id)
+              this.sessionValue.update((session) =>
+                session ? { ...session, user } : null,
+              );
+          }),
+        );
+    });
   }
   signUp(credentials: SignupCredentials): Observable<string> {
     return defer(() =>
@@ -173,7 +215,14 @@ export class AuthService {
         : this.api
             .requestJson<{
               message: string;
-            }>("/auth/signup", { method: "POST", body: credentials })
+            }>("/auth/signup", {
+              method: "POST",
+              body: {
+                ...credentials,
+                country_code: credentials.country_code || null,
+                city: credentials.city?.trim() || null,
+              },
+            })
             .pipe(map((result) => result.message)),
     );
   }
@@ -195,6 +244,7 @@ export class AuthService {
     ).pipe(
       tap(() => {
         ++this.sessionGeneration;
+        this.restoreRequest = undefined;
         this.refreshRequest = undefined;
         this.sessionValue.set(null);
       }),
@@ -220,8 +270,10 @@ export class AuthService {
       .pipe(
         tap((session) => {
           ++this.sessionGeneration;
+          this.restoreRequest = undefined;
           this.refreshRequest = undefined;
           this.sessionValue.set(session);
+          this.lastSessionCheck = Date.now();
           this.errorValue.set("");
         }),
       );
@@ -234,6 +286,7 @@ export class AuthService {
       .pipe(
         tap(() => {
           ++this.sessionGeneration;
+          this.restoreRequest = undefined;
           this.refreshRequest = undefined;
           this.sessionValue.set(null);
         }),

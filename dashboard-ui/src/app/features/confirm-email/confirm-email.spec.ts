@@ -6,14 +6,13 @@ import { AuthService } from "../../services/auth/auth.services";
 import { mockAuthUser } from "../../mocks/auth-mocks";
 import { renderComponent } from "../../../../tests/render-component";
 
-it("shows invalid links without sending a verification request", async () => {
+it("shows inbox guidance for visits without a token without sending a verification request", async () => {
   const { fixture, element } = await renderComponent(ConfirmEmail);
   const verify = vi.spyOn(TestBed.inject(AuthService), "confirmEmail");
   fixture.componentInstance.confirm();
   expect(verify).not.toHaveBeenCalled();
-  expect(element.querySelector('[role="alert"]')?.textContent).toContain(
-    "invalid",
-  );
+  expect(element.textContent).toContain("Check your inbox");
+  expect(element.querySelector('[role="alert"]')).toBeNull();
 });
 it("confirms only on user action and handles expired links", async () => {
   const { fixture } = await renderComponent(ConfirmEmail);

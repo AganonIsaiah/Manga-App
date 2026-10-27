@@ -12,6 +12,8 @@ from app.db.session import make_engine
 from app.features.auth.provider import SupabaseAuth
 from app.features.auth.router import router
 from app.features.auth.service import resolve_email
+from app.features.users.router import router as users_router
+from app.integrations.storage.client import AvatarStorage
 
 
 def create_app(
@@ -20,15 +22,18 @@ def create_app(
     settings = settings or get_settings()
     database = engine if engine is not None else make_engine(settings.database_url)
 
+    avatar_storage = AvatarStorage(settings)
     provider = auth_provider if auth_provider is not None else SupabaseAuth(settings)
 
     @asynccontextmanager
     async def lifespan(app):
         yield
         provider.close()
+        avatar_storage.close()
         database.dispose()
 
     app = FastAPI(title="Manga API", lifespan=lifespan)
+    app.state.avatar_storage = avatar_storage
     app.state.settings = settings
     app.state.engine = database
     app.state.auth_provider = provider
@@ -78,4 +83,5 @@ def create_app(
         allow_headers=["Content-Type", "X-Manga-Client"],
     )
     app.include_router(router)
+    app.include_router(users_router)
     return app

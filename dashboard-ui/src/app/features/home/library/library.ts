@@ -1,5 +1,5 @@
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Subscription, defer } from "rxjs";
+import { Subscription, defer, finalize } from "rxjs";
 import {
   DestroyRef,
   ChangeDetectionStrategy,
@@ -12,6 +12,8 @@ import {
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
+import { countryName } from "../../../config/countries";
+import { BrowserStorage } from "../../../services/browser-storage/browser-storage.services";
 import { HomeStore } from "../../../services/home-store/home-store.services";
 import { HomeApi } from "../../../services/home/home.services";
 import type { UserProfileData } from "../../../models/home-api.model";
@@ -76,6 +78,93 @@ export class Library {
   readonly state = computed(() =>
     this.isPublic() ? this.view()!.state : this.store.state(),
   );
+  private readonly browser = inject(BrowserStorage);
+  readonly avatarPreview = signal<string | null>(null);
+  private avatarFile: File | null = null;
+  readonly avatarPending = signal(false);
+  readonly avatarError = signal("");
+  readonly avatarMessage = signal("");
+  readonly failedAvatar = signal("");
+  readonly avatarUrl = computed(() => {
+    const url = this.isPublic()
+      ? null
+      : this.store.auth.session()?.user.avatar_url;
+    return url && url !== this.failedAvatar() ? url : null;
+  });
+  readonly joinedDate = computed(() => {
+    const createdAt = !this.isPublic()
+      ? this.store.auth.session()?.user.created_at
+      : null;
+    if (createdAt) {
+      const date = new Date(createdAt);
+      if (!Number.isNaN(date.getTime()))
+        return new Intl.DateTimeFormat("en", {
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        }).format(date);
+    }
+    return this.profile()?.date_joined ?? "";
+  });
+  readonly location = computed(() => {
+    if (this.isPublic()) return this.profile()?.location ?? "";
+    const user = this.store.auth.session()?.user;
+    return [user?.city, countryName(user?.country_code)]
+      .filter(Boolean)
+      .join(", ");
+  });
+  selectAvatar(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file || this.avatarPending() || this.isPublic()) return;
+    this.avatarError.set("");
+    this.avatarMessage.set("");
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+      file.size > 5 * 1024 * 1024
+    ) {
+      this.avatarError.set(
+        "Choose a JPEG, PNG or WebP photo smaller than 5 MB.",
+      );
+      return;
+    }
+    this.closeAvatarPreview();
+    this.avatarFile = file;
+    this.avatarPreview.set(this.browser.createObjectUrl(file));
+  }
+  closeAvatarPreview() {
+    if (this.avatarPending()) return;
+    const url = this.avatarPreview();
+    if (url) this.browser.revokeObjectUrl(url);
+    this.avatarPreview.set(null);
+    this.avatarFile = null;
+  }
+  saveAvatar() {
+    const file = this.avatarFile;
+    if (!file || this.avatarPending()) return;
+    this.avatarPending.set(true);
+    this.avatarError.set("");
+    this.store.auth
+      .uploadAvatar(file)
+      .pipe(
+        finalize(() => this.avatarPending.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.avatarMessage.set("Profile photo updated.");
+          this.avatarPending.set(false);
+          this.closeAvatarPreview();
+        },
+        error: (error) =>
+          this.avatarError.set(
+            error instanceof Error
+              ? error.message
+              : "Unable to upload photo. Please try again.",
+          ),
+      });
+  }
   readonly tab = signal<LibraryTab>("profile");
   readonly tabs: LibraryTab[] = ["profile", "readings", "bookmarks", "reviews"];
   readonly connections = signal<"followers" | "following" | null>(null);
@@ -111,6 +200,10 @@ export class Library {
       : (this.profile()?.following ?? []),
   );
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      const url = this.avatarPreview();
+      if (url) this.browser.revokeObjectUrl(url);
+    });
     effect(() => {
       const name = this.requested();
       const isPublic = this.isPublic();
@@ -190,10 +283,16 @@ export class Library {
   readonly signOutError = signal("");
   signOut() {
     this.signOutError.set("");
-    this.store.auth.signOut().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => { void this.router.navigateByUrl("/login", { replaceUrl: true }); },
-      error: () => this.signOutError.set("Unable to sign out. Please try again."),
-    });
+    this.store.auth
+      .signOut()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          void this.router.navigateByUrl("/login", { replaceUrl: true });
+        },
+        error: () =>
+          this.signOutError.set("Unable to sign out. Please try again."),
+      });
   }
   loginParams() {
     return { next: this.router.url };

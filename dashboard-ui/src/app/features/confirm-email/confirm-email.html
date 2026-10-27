@@ -1,28 +1,58 @@
 <main class="auth-page">
   <header class="auth-header">
-    <a routerLink="/home" class="auth-brand" aria-label="Manga home"
-      ><svg [lucideIcon]="icons.BookOpen" [size]="18" aria-hidden="true"></svg
-      ><span>Manga</span></a
-    >
+    <a routerLink="/home" class="auth-brand" aria-label="Manga home">
+      <svg [lucideIcon]="icons.BookOpen" [size]="18" aria-hidden="true"></svg
+      ><span>Manga</span>
+    </a>
     <a routerLink="/login" class="auth-text-link">Sign in</a>
   </header>
   <div class="auth-main">
-    <section class="auth-form-shell" aria-labelledby="confirm-title">
-      <h1 id="confirm-title">Confirm your email</h1>
+    <section
+      class="auth-form-shell confirm-shell"
+      aria-labelledby="confirm-title"
+    >
+      <div class="confirm-icon" aria-hidden="true">
+        <svg
+          [lucideIcon]="complete() ? icons.Check : icons.Send"
+          [size]="28"
+        ></svg>
+      </div>
+      <p class="eyebrow">YOUR NEXT CHAPTER</p>
+      <h1 id="confirm-title">
+        {{complete() ? 'You’re all set' : token ? 'Confirm your email' : 'Check
+        your inbox'}}
+      </h1>
       @if (complete()) {
-      <p class="auth-message" role="status">
-        Your email is confirmed. Welcome to Manga.
+      <p class="auth-subtitle" role="status">
+        Your email is confirmed. Your next favourite story is waiting.
       </p>
       <a routerLink="/home" class="action-primary auth-submit"
         >Start exploring</a
       >
-      } @else if (!token) {
-      <p class="auth-error" role="alert">
-        This confirmation link is invalid. Use the link in your signup email.
+      } @else if (!token) { @if(error()) {
+      <p class="auth-error" role="alert">{{error()}}</p>
+      }
+      <p class="auth-subtitle">
+        Open the confirmation email from Manga and follow its link to finish
+        setting up your account.
       </p>
+      <div class="confirm-help">
+        <p>
+          Can’t find it? Check your spam folder and make sure you used the right
+          email address.
+        </p>
+        <p>Already confirmed? You can sign in below.</p>
+      </div>
+      <a routerLink="/login" class="action-primary auth-submit"
+        >Continue to sign in</a
+      >
+      <a routerLink="/signup" class="auth-text-link">Back to signup</a>
       } @else {
-      <p class="auth-subtitle">One last step before your next story.</p>
-      @if (error()) {
+      <p class="auth-subtitle">
+        One last step before your next story. Confirm your email to make
+        yourself at home.
+      </p>
+      @if(error()) {
       <p class="auth-error" role="alert">{{error()}}</p>
       }
       <button
@@ -33,6 +63,9 @@
       >
         {{pending() ? 'Confirming…' : 'Confirm email'}}
       </button>
+      <a routerLink="/login" class="auth-text-link"
+        >Already confirmed? Sign in</a
+      >
       }
     </section>
   </div>

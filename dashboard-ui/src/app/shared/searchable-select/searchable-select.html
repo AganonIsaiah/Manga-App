@@ -1,0 +1,61 @@
+<div class="searchable-select">
+  <label class="auth-label" [for]="inputId()">{{label()}}</label>
+  <div class="searchable-select-input">
+    <input
+      class="auth-input"
+      [id]="inputId()"
+      role="combobox"
+      type="text"
+      autocomplete="off"
+      maxlength="100"
+      [placeholder]="placeholder()"
+      [value]="text()"
+      [disabled]="disabled()"
+      [attr.aria-expanded]="open()"
+      [attr.aria-controls]="inputId() + '-list'"
+      aria-autocomplete="list"
+      [attr.aria-busy]="loading()"
+      [attr.aria-activedescendant]="open() && active() >= 0 ? inputId() + '-option-' + active() : null"
+      (focus)="show()"
+      (click)="open.set(true)"
+      (input)="search($event)"
+      (keydown)="keydown($event)"
+      (blur)="blur()"
+    />
+    <svg
+      [lucideIcon]="loading() ? icons.LoaderCircle : icons.ChevronDown"
+      [size]="16"
+      [class.auth-spinner]="loading()"
+      aria-hidden="true"
+    ></svg>
+  </div>
+  @if(open() && !disabled()){
+  <div class="searchable-select-popup">
+    <div role="listbox" [id]="inputId() + '-list'" [attr.aria-label]="label()">
+      @for(option of choices(); track option.value; let i=$index){
+      <button
+        type="button"
+        role="option"
+        tabindex="-1"
+        [id]="inputId() + '-option-' + i"
+        [class.is-active]="active() === i"
+        [attr.aria-selected]="value() === option.value"
+        (mousedown)="$event.preventDefault()"
+        (click)="choose(option.value)"
+      >
+        {{option.label}}
+      </button>
+      }
+    </div>
+    @if(loading() || (!matches().length && !allowCustom())){
+    <p class="select-status" role="status">
+      {{loading() ? 'Loading cities…' : 'No matches. Try another search.'}}
+    </p>
+    } @if(matches().length > 100){
+    <p class="select-status">
+      Type to narrow down {{matches().length}} results.
+    </p>
+    }
+  </div>
+  }
+</div>

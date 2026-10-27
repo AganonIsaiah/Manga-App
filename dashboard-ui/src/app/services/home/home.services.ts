@@ -109,7 +109,8 @@ export class HomeApi {
           `/users/${encodeURIComponent(username)}/library`,
         );
       const user = this.auth.session()?.user;
-      const profile = getMockProfileData(username) ??
+      const profile =
+        getMockProfileData(username) ??
         (user?.username === username ? getMockEmptyAccount(user) : null);
       if (!profile) throw new ApiError("Reader not found", 404);
       const result = this.copy(profile);

@@ -76,7 +76,10 @@ class SupabaseAuth:
             body={
                 "email": str(body.email).lower(),
                 "password": body.password,
-                "data": {"username": body.username.lower(), "display_name": body.name},
+                "data": {
+                    "username": body.username.lower(), "display_name": body.name,
+                    "country_code": body.country_code, "city": body.city,
+                },
             },
             params={"redirect_to": f"{self.settings.frontend_url}/confirm-email"},
         )

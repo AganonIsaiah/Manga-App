@@ -32,6 +32,7 @@ def test_stateless_rest_contract_and_no_global_bearer_state(settings, credential
     assert json.loads(requests[0].content)["data"] == {
         "username": credentials["username"],
         "display_name": credentials["name"],
+        "country_code": None, "city": None,
     }
     assert requests[1].url.params["grant_type"] == "password"
     assert requests[2].url.params["grant_type"] == "refresh_token"

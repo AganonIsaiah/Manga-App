@@ -7,6 +7,7 @@
           >{{details().ratings.total_ratings}} total</span
         >
       </div>
+      @if(details().ratings.total_ratings > 0){
       <div class="grid grid-cols-5 gap-3 pt-3 pb-2">
         @for(count of counts();track $index;let i=$index){
         <div
@@ -29,14 +30,25 @@
         </div>
         }
       </div>
+      } @else {
+      <p class="text-sm text-slate-500 leading-relaxed mt-3">
+        {{editable() ? "Your ratings will appear here after your first review."
+        : "No ratings yet."}}
+      </p>
+      }
     </div>
     <div class="border-t border-slate-800 pt-5">
       <h2 class="text-lg font-semibold mb-2">Bio</h2>
-      <p class="text-sm text-slate-400 leading-relaxed">{{details().bio}}</p>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        {{details().bio || (editable() ? 'A little space for your story.' :
+        'This reader hasn’t added a bio yet.')}}
+      </p>
     </div>
     <div class="border-t border-slate-800 pt-5">
       <p class="eyebrow">READING MOOD</p>
-      <p class="text-sm text-orange-200 mt-2">{{readingMood()}}</p>
+      <p class="text-sm text-orange-200 mt-2">
+        {{readingMood() || 'Finding the next great read'}}
+      </p>
     </div>
   </aside>
   <section
@@ -175,7 +187,6 @@
       }
     </div>
   </section>
-
 </div>
 @if(panel();as selected){
 <dialog mangaModal label="Favourite panel" (dismissed)="panel.set(null)">

@@ -10,7 +10,7 @@ Use Python 3.12+ (CI uses 3.13). From the repository root:
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.lock
+pip install -r requirements.txt
 pip install --no-deps -e .
 cp .env.example .env
 ```
@@ -35,7 +35,7 @@ Start the API from `backend/`:
 uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
 ```
 
-In another terminal, run `npm run dev` from `dashboard-ui/`. Its proxy forwards `/api/**` to port 8000 and preserves the Origin. Both `http://localhost:3000` and `http://127.0.0.1:3000` are allowed by the example config.
+In another terminal, run `npm run dev` from `dashboard-ui/`. Its proxy forwards `/api/**` to port 8000 and preserves the Origin. Both `http://localhost:4200` and `http://127.0.0.1:4200` are allowed by the example config.
 
 The normal application creates no demo account. Auth defaults to the backend independently of `USE_MOCKS`, which remains enabled for other frontend services. New accounts get an empty mock library using their real name/username. Explicit mock auth is still available for isolated unit/UI tests, with memory-only sessions.
 
@@ -43,11 +43,11 @@ The normal application creates no demo account. Auth defaults to the backend ind
 
 Enable the Email provider and email/password signup. Set the password minimum to **12 characters** in Supabase as well as the application, so direct Auth API calls enforce the same policy. Keep email confirmation enabled for the normal deployment.
 
-Set **Authentication → URL Configuration → Site URL** to your Angular origin (`http://localhost:3000` locally). Allow these redirect URLs for the corresponding development/production origin:
+Set **Authentication → URL Configuration → Site URL** to your Angular origin (`http://localhost:4200` locally). Allow these redirect URLs for the corresponding development/production origin:
 
 ```text
-http://localhost:3000/confirm-email
-http://localhost:3000/reset-password
+http://localhost:4200/confirm-email
+http://localhost:4200/reset-password
 ```
 
 Configure email delivery/SMTP **in Supabase**, not FastAPI. The default Supabase mail service is restricted; use your own sender for real users. Configure token expiry and session policies in Supabase Auth; the API does not invent its own signing keys or override those policies.
@@ -85,7 +85,7 @@ All endpoints are under `/api/auth`. Angular uses `withCredentials: true`, JSON 
 | POST | `/reset-password` | `{token, password}`; verifies recovery TokenHash, changes password |
 | POST | `/confirm-email` | `{token}`; verifies email TokenHash and creates the cookie session |
 
-Session JSON is only `{user: {id, name, username}, expiresAt}`. `expiresAt` is Unix milliseconds read from the JWT **after Supabase validates the exact token**; unverified local claims never authorize a request. The REST client shares only an HTTP connection pool and immutable API-key config; user Bearer headers are supplied per request, so one user's session cannot leak through global SDK state. Upstream internal error details are not exposed.
+Session JSON contains `{user: {id, name, username, created_at, country_code, city, avatar_url}, expiresAt}` after migration 002. `expiresAt` is Unix milliseconds read from the JWT **after Supabase validates the exact token**; unverified local claims never authorize a request. The REST client shares only an HTTP connection pool and immutable API-key config; user Bearer headers are supplied per request, so one user's session cannot leak through global SDK state. Upstream internal error details are not exposed.
 
 Access and refresh cookies are HttpOnly, host-only, SameSite=Lax by default and Secure in production. The access-cookie path is `/api`; refresh and persistence-choice cookies use `/api/auth`. Without Remember me, cookies are browser-session scoped (browsers may restore them when restoring a session). With Remember me, refresh/persistence cookies have a rolling 30-day browser expiry. Actual refresh lifetime, reuse detection, inactivity and time-box limits remain controlled by Supabase. Angular restores on startup, checks on focus, deduplicates refresh requests and refreshes before the access JWT expires. Auth never falls back to mocks on network/auth failure.
 
@@ -123,3 +123,11 @@ Never point `TEST_DATABASE_URL` at a real Supabase/application database. The sch
 `users/router.py`, `library/router.py`, `search/router.py`, `recommendations/router.py` and `integrations/mangadex/client.py` are intentionally empty and unregistered. No ML/AI directory was created.
 
 References: [Supabase Auth REST](https://supabase.github.io/auth/), [email templates](https://supabase.com/docs/guides/auth/auth-email-templates), [session behavior](https://supabase.com/docs/guides/auth/sessions), [server-side auth](https://supabase.com/docs/guides/auth/server-side/advanced-guide).
+
+## Profile location and photos
+
+After applying `001_auth.sql`, run `migrations/002_profile_details.sql` in the Supabase SQL Editor. It adds optional country/city fields and avatar paths, updates the signup trigger, and creates the public `avatars` bucket with owner-only upload/delete policies. Location is not granted to public database readers. Avatars are public images; location is returned only in the authenticated account session.
+
+`POST /api/users/me/avatar` accepts a raw JPEG, PNG or WebP request body (not JSON or multipart), with the existing auth cookie, allowed Origin, and `X-Manga-Client: web`. The backend limits input to 5 MB / 16 megapixels, applies EXIF orientation, center-crops to 512×512, and re-encodes to WebP without source metadata. It uploads to a unique `<user-id>/<uuid>.webp` path, updates the profile, and then removes the previous object. Failed database updates trigger cleanup of the new object; failed cleanup is logged for maintenance. Storage calls use each user's verified access token and the existing publishable key; no service-role key is required. Install updated requirements before starting the backend.
+
+Email confirmation accepts the configured `#token_hash=...` template (and query token hashes), removes the token from browser history, and verifies only after the confirmation button is clicked. A visit without a token shows inbox guidance instead of an invalid-link error. Keep the custom Supabase email templates above configured; default implicit-flow access tokens are not used by this app.

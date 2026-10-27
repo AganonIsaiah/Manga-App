@@ -1,5 +1,9 @@
 import { Observable, map, timer } from "rxjs";
-import type { AuthUser, LoginCredentials, SignupCredentials } from "../models/auth.model";
+import type {
+  AuthUser,
+  LoginCredentials,
+  SignupCredentials,
+} from "../models/auth.model";
 
 export const mockLoginCredentials: LoginCredentials = {
   identifier: "reader@manga.demo",
@@ -44,14 +48,30 @@ export function mockRequestPasswordReset(email: string): Observable<string> {
 }
 
 export const mockSignupCredentials: SignupCredentials = {
-  name: "New Reader", username: "new_reader", email: "new@example.com", password: "manga-reader-demo",
+  name: "New Reader",
+  username: "new_reader",
+  email: "new@example.com",
+  password: "manga-reader-demo",
 };
 export function mockSignUp(credentials: SignupCredentials): Observable<string> {
-  return timer(mockAuthDelayMs).pipe(map(() => {
-    if (!credentials.name.trim() || !/^[a-zA-Z0-9_]{3,24}$/.test(credentials.username.trim()) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email.trim()) || credentials.password.length < 12)
-      throw new Error("Check your details and use a password with at least 12 characters.");
-    if (credentials.username.trim().toLowerCase() === mockAuthUser.username || credentials.email.trim().toLowerCase() === mockLoginCredentials.identifier)
-      throw new Error("That email or username is already in use.");
-    return "You're all set for the preview. No account has been created yet. Use the demo account on the sign-in page to explore.";
-  }));
+  return timer(mockAuthDelayMs).pipe(
+    map(() => {
+      if (
+        !credentials.name.trim() ||
+        !/^[a-zA-Z0-9_]{3,24}$/.test(credentials.username.trim()) ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email.trim()) ||
+        credentials.password.length < 12
+      )
+        throw new Error(
+          "Check your details and use a password with at least 12 characters.",
+        );
+      if (
+        credentials.username.trim().toLowerCase() === mockAuthUser.username ||
+        credentials.email.trim().toLowerCase() ===
+          mockLoginCredentials.identifier
+      )
+        throw new Error("That email or username is already in use.");
+      return "You're all set for the preview. No account has been created yet. Use the demo account on the sign-in page to explore.";
+    }),
+  );
 }

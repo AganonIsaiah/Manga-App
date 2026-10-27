@@ -198,3 +198,96 @@ it("ignores a stale session restoration that completes after login and logout", 
   expect(auth.session()).toBeNull();
   http.verify();
 });
+
+it("uploads binary photos with cookies and updates only the current session", async () => {
+  authConfig.useMocks = false;
+  const auth = TestBed.inject(AuthService);
+  const http = TestBed.inject(HttpTestingController);
+  const login = firstValueFrom(auth.signIn(mockLoginCredentials));
+  http
+    .expectOne("/api/auth/login")
+    .flush({ user: mockAuthUser, expiresAt: Date.now() + 900000 });
+  await login;
+  const file = new File(["photo"], "photo.png", { type: "image/png" });
+  const upload = firstValueFrom(auth.uploadAvatar(file));
+  const request = http.expectOne("/api/users/me/avatar");
+  expect(request.request.body).toBe(file);
+  expect(request.request.withCredentials).toBe(true);
+  expect(request.request.headers.has("Content-Type")).toBe(false);
+  request.flush({
+    ...mockAuthUser,
+    avatar_url: "https://example.test/avatar.webp",
+  });
+  await upload;
+  expect(auth.session()?.user.avatar_url).toBe(
+    "https://example.test/avatar.webp",
+  );
+  const staleUpload = firstValueFrom(auth.uploadAvatar(file));
+  const staleRequest = http.expectOne("/api/users/me/avatar");
+  const logout = firstValueFrom(auth.signOut());
+  http.expectOne("/api/auth/logout").flush(null);
+  await logout;
+  staleRequest.flush({
+    ...mockAuthUser,
+    avatar_url: "https://example.test/stale.webp",
+  });
+  await staleUpload;
+  expect(auth.session()).toBeNull();
+  http.verify();
+});
+
+it("does not recheck guests when window focus changes", async () => {
+  authConfig.useMocks = false;
+  const auth = TestBed.inject(AuthService);
+  const http = TestBed.inject(HttpTestingController);
+  const restored = firstValueFrom(auth.restore());
+  http
+    .expectOne("/api/auth/session")
+    .flush({}, { status: 401, statusText: "Unauthorized" });
+  http
+    .expectOne("/api/auth/refresh")
+    .flush({}, { status: 401, statusText: "Unauthorized" });
+  await restored;
+  window.dispatchEvent(new Event("focus"));
+  window.dispatchEvent(new Event("focus"));
+  http.expectNone("/api/auth/session");
+  http.expectNone("/api/auth/refresh");
+  http.verify();
+});
+
+it("shares concurrent restoration requests", async () => {
+  authConfig.useMocks = false;
+  const auth = TestBed.inject(AuthService);
+  const http = TestBed.inject(HttpTestingController);
+  const first = firstValueFrom(auth.restore());
+  const second = firstValueFrom(auth.restore());
+  http
+    .expectOne("/api/auth/session")
+    .flush({ user: mockAuthUser, expiresAt: Date.now() + 900000 });
+  expect(await first).toEqual(await second);
+  http.verify();
+});
+
+it("limits signed-in focus checks to once a minute and ignores focus while a check is pending", async () => {
+  vi.useFakeTimers();
+  authConfig.useMocks = false;
+  const auth = TestBed.inject(AuthService);
+  const http = TestBed.inject(HttpTestingController);
+  const login = firstValueFrom(auth.signIn(mockLoginCredentials));
+  http
+    .expectOne("/api/auth/login")
+    .flush({ user: mockAuthUser, expiresAt: Date.now() + 900000 });
+  await login;
+  TestBed.tick();
+  window.dispatchEvent(new Event("focus"));
+  http.expectNone("/api/auth/session");
+  vi.advanceTimersByTime(60_000);
+  window.dispatchEvent(new Event("focus"));
+  window.dispatchEvent(new Event("focus"));
+  const request = http.expectOne("/api/auth/session");
+  expect(request.cancelled).toBe(false);
+  request.flush({ user: mockAuthUser, expiresAt: Date.now() + 900000 });
+  window.dispatchEvent(new Event("focus"));
+  http.expectNone("/api/auth/session");
+  http.verify();
+});

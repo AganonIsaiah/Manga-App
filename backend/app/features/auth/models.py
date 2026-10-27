@@ -15,6 +15,9 @@ class Profile(Base):
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
     username: Mapped[str] = mapped_column(String(24), unique=True)
     display_name: Mapped[str] = mapped_column(String(80))
+    country_code: Mapped[str | None] = mapped_column(String(2), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    avatar_path: Mapped[str | None] = mapped_column(String(300), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 

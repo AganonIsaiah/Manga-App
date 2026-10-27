@@ -15,10 +15,15 @@
         (click)="flip(true)"
       >
         <span class="feed-card-stats">
-          <span class="feed-card-credit" [title]="manga.title + ' · ' + manga.authors.join(', ')">
+          <span
+            class="feed-card-credit"
+            [title]="manga.title + ' · ' + manga.authors.join(', ')"
+          >
             <span class="feed-card-title">{{ manga.title }}</span>
             <span class="shrink-0 text-slate-500" aria-hidden="true">·</span>
-            <span class="feed-card-authors">{{ manga.authors.join(', ') }}</span>
+            <span class="feed-card-authors"
+              >{{ manga.authors.join(', ') }}</span
+            >
           </span>
           <span
             class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
@@ -36,7 +41,6 @@
               >Not rated</span
             >}
           </span>
-
         </span>
         <span class="feed-card-panel">
           <img

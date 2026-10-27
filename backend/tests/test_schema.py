@@ -30,6 +30,22 @@ def test_supabase_profile_trigger_policies_and_username_lookup():
                 if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if;
             end $$;
         """)
+        connection.exec_driver_sql("""
+            create schema if not exists storage;
+            create table if not exists storage.buckets (
+                id text primary key, name text, public boolean,
+                file_size_limit bigint, allowed_mime_types text[]
+            );
+            create table if not exists storage.objects (bucket_id text, name text);
+            alter table storage.objects enable row level security;
+            create or replace function storage.foldername(name text) returns text[]
+                language sql immutable as $$ select string_to_array(name, '/') $$;
+            create or replace function auth.uid() returns uuid language sql stable as
+                $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+            drop policy if exists "Readers upload own avatars" on storage.objects;
+            drop policy if exists "Readers select own avatars" on storage.objects;
+            drop policy if exists "Readers delete own avatars" on storage.objects;
+        """)
         existing = uuid4()
         connection.execute(
             text("insert into auth.users(id,email) values (:id,'existing@example.com')"),
@@ -40,12 +56,16 @@ def test_supabase_profile_trigger_policies_and_username_lookup():
             connection.exec_driver_sql(
                 Path(__file__).parents[1].joinpath("migrations/001_auth.sql").read_text()
             )
+        with engine.connect() as connection:
+            connection.exec_driver_sql(
+                Path(__file__).parents[1].joinpath("migrations/002_profile_details.sql").read_text()
+            )
         with engine.begin() as connection:
             uid = uuid4()
             connection.execute(
                 text(
                     "insert into auth.users(id,email,raw_user_meta_data) values "
-                    '(:id,\'new@example.com\', \'{"username":"new_reader","display_name":"New Reader"}\')'
+                    '(:id,\'new@example.com\', \'{"username":"new_reader","display_name":"New Reader","country_code":"CA","city":"Toronto"}\')'
                 ),
                 {"id": uid},
             )
@@ -70,6 +90,15 @@ def test_supabase_profile_trigger_policies_and_username_lookup():
             ).scalar()
             assert not connection.exec_driver_sql(
                 "select has_table_privilege('authenticated','public.profiles','UPDATE')"
+            ).scalar()
+            assert connection.execute(
+                text("select city from public.profiles where id=:id"), {"id": uid}
+            ).scalar() == "Toronto"
+            assert not connection.exec_driver_sql(
+                "select has_column_privilege('anon','public.profiles','city','SELECT')"
+            ).scalar()
+            assert connection.exec_driver_sql(
+                "select public from storage.buckets where id='avatars'"
             ).scalar()
         with Session(engine) as db:
             assert resolve_email(db, "NEW_READER") == "new@example.com"

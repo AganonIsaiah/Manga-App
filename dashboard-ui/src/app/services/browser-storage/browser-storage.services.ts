@@ -7,6 +7,12 @@ export class BrowserStorage {
   readonly window = isPlatformBrowser(inject(PLATFORM_ID))
     ? this.document.defaultView
     : null;
+  createObjectUrl(file: Blob): string | null {
+    return this.window ? URL.createObjectURL(file) : null;
+  }
+  revokeObjectUrl(url: string): void {
+    if (this.window) URL.revokeObjectURL(url);
+  }
   read(
     key: string,
     scope: "localStorage" | "sessionStorage" = "localStorage",

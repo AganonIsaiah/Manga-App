@@ -21,7 +21,7 @@ export default defineConfig({
     },
     {
       command:
-        "npm run start -- --host 127.0.0.1 --port 3100 --proxy-config proxy.e2e.conf.json",
+        "npx ng serve --configuration production --host 127.0.0.1 --port 3100 --proxy-config proxy.e2e.conf.json",
       url: "http://127.0.0.1:3100/login",
       reuseExistingServer: false,
       timeout: 120_000,

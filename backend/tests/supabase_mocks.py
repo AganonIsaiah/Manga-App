@@ -2,6 +2,7 @@
 
 import secrets
 import time
+from types import SimpleNamespace
 from uuid import UUID, uuid4
 
 import jwt
@@ -14,6 +15,7 @@ from app.features.auth.models import Profile
 
 class SupabaseMock:
     def __init__(self, engine):
+        self.settings = SimpleNamespace(supabase_url="https://example.supabase.co")
         self.engine = engine
         self.users = {}
         self.sessions = {}
@@ -44,6 +46,7 @@ class SupabaseMock:
                     id=UUID(uid),
                     username=body.username.lower(),
                     display_name=body.name,
+                    country_code=body.country_code, city=body.city,
                     created_at=now(),
                 )
             )

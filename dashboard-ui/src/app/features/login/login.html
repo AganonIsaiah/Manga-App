@@ -135,9 +135,16 @@
         </fieldset>
       </form>
       @if (!reset()) {
-      <p class="auth-subtitle">New here? <a class="auth-text-link" routerLink="/signup" [queryParams]="{next: destination()}">Create an account</a></p>
-      }
-      @if (demoEnabled) {
+      <p class="auth-subtitle">
+        New here?
+        <a
+          class="auth-text-link"
+          routerLink="/signup"
+          [queryParams]="{next: destination()}"
+          >Create an account</a
+        >
+      </p>
+      } @if (demoEnabled) {
       <div class="auth-demo">
         <p>Try it out while accounts are being built.</p>
         <button

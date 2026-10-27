@@ -566,17 +566,43 @@ export function getMockReaders({
   );
 }
 
-
-export function getMockEmptyAccount(user: import("../models/auth.model").AuthUser): import("../models/home-api.model").UserProfileData {
+export function getMockEmptyAccount(
+  user: import("../models/auth.model").AuthUser,
+): import("../models/home-api.model").UserProfileData {
   return {
     profile: {
-      ...mockProfileDetails, name: user.name, username: user.username,
-      read_this_year: 0, read_all_time: 0, bio: "", header: "Your next story starts here.",
-      following: [], followers: [], favourite_manga: {}, recently_read: {},
-      ratings: { one_star: 0, two_stars: 0, three_stars: 0, four_stars: 0, five_stars: 0, total_ratings: 0 },
-      location: "", date_joined: "", account_age_months: 0,
+      ...mockProfileDetails,
+      name: user.name,
+      username: user.username,
+      read_this_year: 0,
+      read_all_time: 0,
+      bio: "",
+      header: "Your next story starts here.",
+      following: [],
+      followers: [],
+      favourite_manga: {},
+      recently_read: {},
+      ratings: {
+        one_star: 0,
+        two_stars: 0,
+        three_stars: 0,
+        four_stars: 0,
+        five_stars: 0,
+        total_ratings: 0,
+      },
+      location: "",
+      date_joined: "",
+      account_age_months: 0,
     },
-    state: { following: [], bookmarks: [], progress: {}, reviews: [], favouritePanels: [] },
-    favouritePanels: [], readingMood: "What will you read next?", avatarColor: "#d9aa9d",
+    state: {
+      following: [],
+      bookmarks: [],
+      progress: {},
+      reviews: [],
+      favouritePanels: [],
+    },
+    favouritePanels: [],
+    readingMood: "What will you read next?",
+    avatarColor: "#d9aa9d",
   };
 }
