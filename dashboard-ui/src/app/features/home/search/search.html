@@ -1,0 +1,159 @@
+<ng-template #searchBar
+  ><form
+    class="my-2 flex w-[600px] max-w-full items-center gap-2 rounded-md px-3 py-2 primary-border max-sm:w-[390px]"
+    (ngSubmit)="submit()"
+  >
+    <input
+      class="min-w-0 flex-1 bg-transparent pl-1 outline-none"
+      type="text"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      name="query"
+      aria-label="Search manga or readers"
+      placeholder="A title, a story idea, or @username…"
+    /><button
+      type="submit"
+      [disabled]="!query().trim()"
+      class="btn-transitions shrink-0 rounded-full p-1.5 text-gray-400 hover:text-white disabled:cursor-not-allowed! disabled:opacity-40 disabled:hover:text-gray-400"
+      aria-label="Search"
+    >
+      <svg [lucideIcon]="icons.Send" [size]="16" aria-hidden="true"></svg>
+    </button></form
+></ng-template>
+@if (submitted()) {
+<ng-container [ngTemplateOutlet]="searchBar" />
+}
+<div class="flex w-full flex-col items-center justify-center">
+  @if (!submitted()) {
+  <div class="flex flex-col gap-6 items-center justify-center">
+    <div class="flex flex-col items-center justify-center gap-3">
+      <h1 class="text-3xl sm:text-4xl font-semibold text-center">
+        What Do You Want to Read?
+      </h1>
+      <p class="text-gray-400 text-center text-sm">
+        Find a story, describe a world, or look up a reader.
+      </p>
+    </div>
+    <p class="eyebrow">A NEW CHAPTER STARTS HERE</p>
+    <ng-container [ngTemplateOutlet]="searchBar" />
+    <ul class="flex flex-wrap justify-center gap-2 max-w-[600px]">
+      @for (pill of store.data()?.suggestions; track pill) {
+      <li>
+        <button
+          type="button"
+          [attr.aria-pressed]="selected(pill)"
+          (click)="toggle(pill)"
+          class="btn-transitions rounded-full px-3 py-1 text-sm primary-border hover:text-white"
+          [class]="
+                selected(pill) ? 'text-white border-white!' : 'text-slate-400'
+              "
+        >
+          {{ pill }}
+        </button>
+      </li>
+      }
+    </ul>
+    <button
+      type="button"
+      (click)="query.set('')"
+      class="btn-transitions flex shrink-0 items-center justify-center gap-1 rounded-full p-1 text-sm text-gray-400 enabled:hover:text-white disabled:cursor-not-allowed!"
+      [disabled]="!query().length"
+      aria-label="Clear search"
+    >
+      <span class="font-medium">Clear All</span
+      ><svg
+        [lucideIcon]="icons.X"
+        [size]="14"
+        aria-hidden="true"
+        class="font-extralight"
+      ></svg>
+    </button>
+  </div>
+  } @else {
+  <section class="results-shell" aria-labelledby="results-title">
+    <button
+      (click)="navigate('')"
+      class="flex items-center gap-2 text-sm text-slate-400"
+    >
+      <svg [lucideIcon]="icons.ArrowLeft" [size]="16"></svg>New search
+    </button>
+    <div>
+      <p class="eyebrow">FIND YOUR NEXT OBSESSION</p>
+      <h1 id="results-title" class="text-3xl font-semibold mt-2">
+        Search results
+      </h1>
+      <p class="text-slate-400 mt-2 break-words">
+        Exploring “{{ submitted() }}”
+      </p>
+    </div>
+    <div class="segmented" aria-label="Result type">
+      <button
+        [attr.aria-pressed]="kind() === 'manga'"
+        (click)="kind.set('manga')"
+      >
+        Manga</button
+      ><button
+        [attr.aria-pressed]="kind() === 'users'"
+        (click)="kind.set('users')"
+      >
+        Readers
+      </button>
+    </div>
+    @if (kind() === "users") {
+    <manga-people [query]="submitted()" />
+    } @else {
+    <div class="flex flex-wrap gap-2">
+      <select
+        aria-label="Filter by genre"
+        [ngModel]="genre()"
+        (ngModelChange)="genre.set($event)"
+      >
+        @for (g of genres(); track g) {
+        <option>{{ g }}</option>
+        }</select
+      ><select
+        aria-label="Filter by status"
+        [ngModel]="status()"
+        (ngModelChange)="status.set($event)"
+      >
+        @for (s of statuses; track s) {
+        <option>{{ s }}</option>
+        }</select
+      ><select
+        aria-label="Sort results"
+        [ngModel]="sort()"
+        (ngModelChange)="sort.set($event)"
+      >
+        @for (s of sorts; track s) {
+        <option>{{ s }}</option>
+        }
+      </select>
+    </div>
+    <p class="text-xs text-slate-400" role="status">
+      {{ loading() ? "Searching…" : matches().length + (matches().length === 1 ?
+      " story" : " stories") + " found" }}
+    </p>
+    @if (loading() || error()) {
+    <manga-service-notice
+      [error]="error()"
+      label="Searching manga…"
+      (retry)="load()"
+    />
+    } @else if (matches().length) {
+    <div class="manga-grid">
+      @for (m of matches(); track m.id) {
+      <article mangaCard [manga]="m"></article>
+      }
+    </div>
+    } @else {
+    <div class="empty-state">
+      <h2 class="text-white font-medium mb-2">No stories found</h2>
+      <p>Try a title, author, or a genre like fantasy or romance.</p>
+      <button class="action-secondary mt-4" (click)="reset()">
+        Reset filters
+      </button>
+    </div>
+    } }
+  </section>
+  }
+</div>

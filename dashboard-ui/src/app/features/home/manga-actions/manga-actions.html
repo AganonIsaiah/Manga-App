@@ -1,0 +1,65 @@
+<div class="flex items-center gap-2">
+  <button class="action-primary flex-1" (click)="start()">
+    <svg [lucideIcon]="icons.BookOpen" [size]="15" aria-hidden="true"></svg>{{
+    current() ? "Continue · Ch. " + current() : "Start reading" }}
+  </button>
+  <button
+    class="action-icon"
+    [attr.aria-label]="
+          (saved() ? 'Remove bookmark for ' : 'Bookmark ') + manga().title
+        "
+    [attr.aria-pressed]="saved()"
+    (click)="store.toggleBookmark(manga().id)"
+  >
+    <svg
+      [lucideIcon]="icons.Bookmark"
+      [size]="17"
+      [class]="saved() ? 'fill-orange-300 text-orange-300' : ''"
+      aria-hidden="true"
+    ></svg>
+  </button>
+</div>
+@if (open()) {
+<dialog
+  mangaModal
+  [label]="manga().title + ' preview'"
+  (dismissed)="open.set(false)"
+>
+  <div class="flex items-center justify-between gap-4">
+    <h2 class="font-semibold">{{ manga().title }}</h2>
+    <button
+      class="action-icon"
+      (click)="open.set(false)"
+      aria-label="Close preview"
+    >
+      <svg [lucideIcon]="icons.X" [size]="18" aria-hidden="true"></svg>
+    </button>
+  </div>
+  <p class="text-sm text-slate-400 my-4">
+    Reading preview · Chapter {{ current() }}
+  </p>
+  <div class="preview-panel">
+    <svg [lucideIcon]="icons.BookOpen" [size]="36" aria-hidden="true"></svg>
+    <p>Your next chapter awaits.</p>
+    <p class="text-sm text-slate-400">
+      This demo tracks your progress. Manga pages will be available when the
+      reader service is connected.
+    </p>
+  </div>
+  <div class="mt-4 flex gap-2">
+    <button
+      class="action-secondary"
+      [disabled]="current()! <= 1"
+      (click)="store.read(manga().id, current()! - 1)"
+    >
+      Previous chapter</button
+    ><button
+      class="action-primary"
+      [disabled]="current()! >= limit()"
+      (click)="store.read(manga().id, current()! + 1)"
+    >
+      Next chapter
+    </button>
+  </div>
+</dialog>
+}

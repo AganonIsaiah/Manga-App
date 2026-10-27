@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { mockCoverSvg } from "./network-mocks";
+import { mockCoverSvg } from "../mock/network-mocks";
 
 test.use({ hasTouch: true });
 

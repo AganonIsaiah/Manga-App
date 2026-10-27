@@ -1,0 +1,103 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "analytics": false
+  },
+  "projects": {
+    "dashboard-ui": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "manga",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/dashboard-ui",
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "all",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                }
+              ]
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "dashboard-ui:build:production"
+            },
+            "development": {
+              "buildTarget": "dashboard-ui:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "tests/angular-setup.ts"
+            ],
+            "coverageExclude": [
+              "**/*-mocks.ts",
+              "**/icons.ts",
+              "**/main.ts",
+              "**/app.config.ts"
+            ],
+            "coverageThresholds": {
+              "statements": 80,
+              "lines": 80,
+              "functions": 75,
+              "branches": 70
+            }
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "type": "",
+          "addTypeToClassName": false,
+          "flat": false,
+          "inlineTemplate": false,
+          "skipTests": false
+        },
+        "@schematics/angular:service": {
+          "type": "services",
+          "addTypeToClassName": false,
+          "injectable": true
+        },
+        "@schematics/angular:interface": {
+          "type": "model"
+        }
+      }
+    }
+  }
+}

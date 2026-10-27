@@ -1,0 +1,10 @@
+@if (!error()) {
+<p class="p-6 text-sm text-slate-400" role="status">{{ label() }}</p>
+} @else {
+<div class="empty-state">
+  <p role="alert">{{ error()!.message }}</p>
+  <button type="button" class="action-secondary mt-4" (click)="retry.emit()">
+    Try again
+  </button>
+</div>
+}

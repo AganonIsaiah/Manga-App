@@ -1,0 +1,330 @@
+@if (isPublic() && !view()) { @if (notFound()) {
+<section class="library-guest">
+  <h1>Reader not found</h1>
+  <a routerLink="/home" [queryParams]="{ tab: 'search' }" class="auth-text-link"
+    >Search readers</a
+  >
+</section>
+} @else {
+<manga-service-notice
+  [error]="error()"
+  label="Loading reader…"
+  (retry)="load()"
+/>
+} } @else if (!view()) {
+<section class="library-guest" aria-labelledby="library-sign-in-title">
+  <svg
+    [lucideIcon]="icons.BookOpen"
+    [size]="28"
+    class="text-orange-300"
+    aria-hidden="true"
+  ></svg>
+  <h1 id="library-sign-in-title">Your library</h1>
+  <p>Sign in to see your readings, bookmarks, and reviews.</p>
+  <a
+    class="action-primary"
+    routerLink="/login"
+    [queryParams]="{ next: '/home?tab=library' }"
+    ><svg [lucideIcon]="icons.LogIn" [size]="16" aria-hidden="true"></svg>Sign
+    in</a
+  ><a
+    class="auth-text-link"
+    routerLink="/home"
+    [queryParams]="{ tab: 'search' }"
+    >Discover manga</a
+  >
+</section>
+} @else { @if (profile(); as p) { @let v = view()!;
+<div class="library-shell">
+  <div class="library-session">
+    @if (store.auth.username()) {
+    <button class="auth-text-link" (click)="signOut()">
+      <svg [lucideIcon]="icons.LogOut" [size]="13" aria-hidden="true"></svg>Sign
+      out
+    </button>
+    } @else {
+    <a class="auth-text-link" routerLink="/login" [queryParams]="loginParams()"
+      >Sign in</a
+    >
+    }
+  </div>
+  <header class="flex flex-col gap-5">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex min-w-0 items-center gap-3">
+        <span class="avatar profile-avatar" [style.background]="v.avatarColor"
+          >{{ p.name.slice(0, 1) }}</span
+        >
+        <div class="min-w-0">
+          <h1 class="text-2xl font-semibold truncate">{{ p.name }}</h1>
+          <p class="text-sm text-slate-400">@{{ p.username }}</p>
+        </div>
+      </div>
+      @if (isPublic()) {
+      <button
+        class="action-secondary"
+        (click)="store.toggleFollow(p.username)"
+        [attr.aria-pressed]="store.state().following.includes(p.username)"
+      >
+        {{ store.state().following.includes(p.username) ? "Following" : "Follow"
+        }}
+      </button>
+      }
+    </div>
+    <div class="profile-stats">
+      <button disabled class="stat">
+        <strong>{{ p.read_this_year }}</strong
+        ><span>Read this year</span></button
+      ><button disabled class="stat">
+        <strong>{{ p.read_all_time }}</strong><span>Read all time</span></button
+      ><button class="stat" (click)="connections.set('followers')">
+        <strong
+          >{{ p.followers.length + (isPublic() &&
+          store.state().following.includes(p.username) ? 1 : 0) }}</strong
+        ><span>Followers</span></button
+      ><button class="stat" (click)="connections.set('following')">
+        <strong>{{ p.following.length }}</strong><span>Following</span>
+      </button>
+    </div>
+    @if (tab() === "profile") {
+    <div>
+      <p class="text-sm text-slate-300">{{ p.header }}</p>
+      <p class="text-xs text-slate-500 mt-2">
+        Joined {{ p.date_joined }} · {{ p.location }}
+      </p>
+    </div>
+    } @if (isPublic()) {
+    <a
+      routerLink="/home"
+      [queryParams]="{ tab: 'library' }"
+      class="text-xs text-orange-200"
+      >← Back to your library</a
+    >
+    }
+  </header>
+  <nav class="library-tabs" aria-label="Library sections">
+    @for (t of tabs; track t) {
+    <button
+      [attr.aria-current]="tab() === t ? 'page' : null"
+      (click)="changeTab(t)"
+    >
+      {{ t.charAt(0).toUpperCase() + t.slice(1) }} @if (count(t) !== null) {
+      <span>{{ count(t) }}</span>
+      }
+    </button>
+    }
+  </nav>
+  @if (tab() === "profile") {
+  <manga-profile
+    [details]="p"
+    [favouritePanels]="v.favouritePanels"
+    [readingMood]="v.readingMood"
+  />
+  } @else {
+  <section class="flex flex-col gap-5">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">YOUR LITTLE CORNER OF MANGA</p>
+        <h2 class="text-2xl font-semibold mt-1">
+          {{ tab() === "readings" ? "Between the pages" : tab() === "bookmarks"
+          ? "Saved for later" : "Thoughts after the last page" }}
+        </h2>
+        <p class="text-sm text-slate-400 mt-2">
+          {{ tab() === "readings" ? "Pick up right where you left off." : tab()
+          === "bookmarks" ? "Your next great read is waiting here." : "Stories
+          worth talking about." }}
+        </p>
+      </div>
+      @if (tab() === "reviews" && !isPublic()) {
+      <button class="action-primary" (click)="startReview()">
+        Write a review
+      </button>
+      }
+    </div>
+    @if (tab() !== "reviews") {
+    <div class="flex flex-wrap sm:flex-nowrap gap-3 items-center">
+      <input
+        class="library-input flex-1 min-w-0"
+        [attr.aria-label]="'Search ' + tab()"
+        [placeholder]="'Search your ' + tab() + '…'"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      />
+      @if (tab() === "readings") {
+      <div class="segmented">
+        @for (f of filters; track f) {
+        <button [attr.aria-pressed]="filter() === f" (click)="filter.set(f)">
+          {{ f }}
+        </button>
+        }
+      </div>
+      }
+    </div>
+    @if (list().length) {
+    <div class="manga-grid">
+      @for (m of list(); track m.id) {
+      <div>
+        <article mangaCard [manga]="m"></article>
+        @if (tab() === "readings") {
+        <div class="progress-block">
+          <div class="flex justify-between text-xs text-slate-400">
+            <span>Chapter {{ state().progress[m.id] ?? 1 }}</span
+            ><span>{{ m.recent_chapter }}</span>
+          </div>
+          <progress
+            [attr.aria-label]="m.title + ' reading progress'"
+            [value]="state().progress[m.id] ?? 1"
+            [max]="latest(m.id)"
+          ></progress>
+          @if (!isPublic()) {
+          <label class="text-xs text-slate-400 flex items-center gap-2 mt-2"
+            >Update chapter<input
+              [attr.aria-label]="'Chapter for ' + m.title"
+              class="chapter-input"
+              type="number"
+              min="1"
+              [max]="latest(m.id)"
+              [ngModel]="state().progress[m.id] || 1"
+              (ngModelChange)="store.read(m.id, $event)"
+          /></label>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="empty-state">
+      {{ query() || filter() !== "All" ? "No titles match these filters." :
+      "Your shelf is ready for its first story." }}<a
+        class="block text-orange-200 mt-3"
+        routerLink="/home"
+        [queryParams]="{ tab: 'search' }"
+        >Discover manga →</a
+      >
+    </div>
+    } } @else {
+    <div class="flex flex-col gap-4">
+      @for (r of state().reviews; track r.id) {
+      <article class="review-card">
+        <div class="flex justify-between gap-3">
+          <div>
+            <h3 class="font-semibold">{{ title(r.id) }}</h3>
+            <div
+              class="flex items-center gap-1 text-orange-200 mt-2"
+              [attr.aria-label]="r.rating + ' out of 5 stars'"
+            >
+              @for (i of stars; track i) {
+              <svg
+                [lucideIcon]="icons.Star"
+                [size]="14"
+                [class]="
+                              i < r.rating
+                                ? 'fill-orange-200'
+                                : 'text-slate-600'
+                            "
+              ></svg>
+              }
+            </div>
+          </div>
+          <span class="text-xs text-slate-500">{{ r.date }}</span>
+        </div>
+        <p
+          class="text-sm leading-relaxed text-slate-300 my-4 whitespace-pre-wrap"
+        >
+          {{ r.text }}
+        </p>
+        @if (!isPublic()) {
+        <div class="flex gap-3">
+          <button
+            class="text-xs text-slate-400 flex gap-1 items-center"
+            (click)="edit(r)"
+          >
+            <svg [lucideIcon]="icons.Pencil" [size]="13"></svg>Edit</button
+          ><button
+            class="text-xs text-slate-400 flex gap-1 items-center"
+            (click)="store.deleteReview(r.id)"
+          >
+            <svg [lucideIcon]="icons.Trash2" [size]="13"></svg>Delete
+          </button>
+        </div>
+        }
+      </article>
+      } @empty {
+      <p class="empty-state">
+        No reviews yet. Share what you thought of your last read.
+      </p>
+      }
+    </div>
+    }
+  </section>
+  } @if (connections(); as selected) {
+  <dialog mangaModal [label]="selected" (dismissed)="connections.set(null)">
+    <div class="flex justify-between mb-5">
+      <h2 class="text-xl capitalize">{{ selected }}</h2>
+      <button
+        aria-label="Close connections"
+        class="action-icon"
+        (click)="connections.set(null)"
+      >
+        <svg [lucideIcon]="icons.X" [size]="18"></svg>
+      </button>
+    </div>
+    <manga-people [usernames]="connectionNames()" />
+  </dialog>
+  } @if (draft(); as d) {
+  <dialog mangaModal label="Write a review" (dismissed)="draft.set(null)">
+    <form
+      ngNativeValidate
+      (ngSubmit)="saveReview()"
+      class="flex flex-col gap-4"
+    >
+      <div class="flex justify-between">
+        <h2 class="text-xl font-semibold">Your review</h2>
+        <button
+          type="button"
+          aria-label="Close review editor"
+          (click)="draft.set(null)"
+        >
+          <svg [lucideIcon]="icons.X" [size]="18"></svg>
+        </button>
+      </div>
+      <label class="text-sm"
+        >Manga<select
+          name="manga"
+          class="block w-full mt-2"
+          [ngModel]="d.id"
+          (ngModelChange)="patchDraft({ id: $event })"
+        >
+          @for (m of store.catalog(); track m.id) {
+          <option [value]="m.id">{{ m.title }}</option>
+          }
+        </select></label
+      ><label class="text-sm"
+        >Rating<select
+          name="rating"
+          class="block mt-2"
+          [ngModel]="d.rating"
+          (ngModelChange)="patchDraft({ rating: +$event })"
+        >
+          @for (n of ratings; track n) {
+          <option [ngValue]="n">{{ n }} stars</option>
+          }
+        </select></label
+      ><textarea
+        name="text"
+        required
+        maxlength="2000"
+        aria-label="Review text"
+        placeholder="What stayed with you?"
+        class="library-input min-h-32"
+        [ngModel]="d.text"
+        (ngModelChange)="patchDraft({ text: $event })"
+      ></textarea
+      ><button class="action-primary" [disabled]="!d.text.trim()">
+        Save review
+      </button>
+    </form>
+  </dialog>
+  }
+</div>
+} }

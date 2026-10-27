@@ -1,0 +1,86 @@
+<div class="home-view-card h-full flex flex-col rounded-lg my-3">
+  <div
+    class="h-[42%] shrink-0 bg-slate-800 bg-cover bg-center"
+    [style.background-image]="cover()"
+    role="img"
+    [attr.aria-label]="manga.title + ' cover'"
+  ></div>
+  <div class="primary-clr min-h-0 flex-1 flex flex-col rounded-b">
+    <div
+      class="p-4 flex flex-col flex-1 gap-2 border-y border-slate-500 min-h-0"
+    >
+      <div class="flex justify-between items-center">
+        <div
+          class="group relative min-w-0 flex-1 pr-3 cursor-pointer!"
+          tabindex="0"
+        >
+          <div class="truncate text-xl font-semibold">{{ manga.title }}</div>
+
+          <div
+            role="tooltip"
+            class="cursor-pointer! absolute left-0 top-full z-50 mt-2 hidden w-max max-w-[300px] rounded-md bg-slate-700 px-3 py-2 text-sm font-normal text-white shadow-lg group-hover:block group-focus:block"
+          >
+            {{ manga.title }}
+          </div>
+        </div>
+        <div class="flex items-center justify-center gap-1.25">
+          <span
+            class="w-2 h-2 rounded-full"
+            [class.bg-emerald-400]="manga.status === 'ongoing'"
+            [class.bg-sky-400]="manga.status === 'completed'"
+            [class.bg-amber-400]="manga.status === 'hiatus'"
+          ></span>
+          <span
+            class="text-xs font-medium"
+            [class.text-emerald-300]="manga.status === 'ongoing'"
+            [class.text-sky-300]="manga.status === 'completed'"
+            [class.text-amber-300]="manga.status === 'hiatus'"
+          >
+            {{ manga.status === "ongoing" ? "Ongoing" : manga.status ===
+            "completed" ? "Completed" : "Hiatus" }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex gap-3 text-xs text-secondary font-medium">
+        <div>Story: {{ manga.authors.join(", ") }}</div>
+        <div>Art: {{ manga.artists.join(", ") }}</div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        @for (genre of manga.genres; track genre) {
+        <span class="rounded-md bg-gray-800 px-3 py-1 text-sm text-slate-400">
+          {{ genre }}
+        </span>
+        }
+      </div>
+
+      <div
+        class="text-sm text-slate-300 overflow-y-auto overflow-x-hidden min-h-12 flex-1 leading-relaxed"
+      >
+        {{ manga.description }}
+      </div>
+    </div>
+
+    <div
+      class="py-2 px-3 border-b border-slate-500 flex items-center justify-between text-sm"
+    >
+      <div class="flex flex-col">
+        <div class="text-gray-400">First published</div>
+        <div class="font-medium">{{ manga.publication_year }}</div>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="text-gray-400">Demographic</div>
+        <div class="font-medium">{{ manga.demographic }}</div>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="text-gray-400">Latest Chapter</div>
+        <div class="font-medium">{{ manga.recent_chapter }}</div>
+      </div>
+    </div>
+
+    <div class="p-3"><manga-actions [manga]="manga" /></div>
+  </div>
+</div>

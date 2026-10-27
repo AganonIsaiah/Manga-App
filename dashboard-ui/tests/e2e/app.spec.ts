@@ -4,9 +4,9 @@ import {
   mockFavouritePanels,
   mockProfileDetails,
   readers,
-} from "../../src/features/home/home.api-mocks";
+} from "../../src/app/mocks/home-mocks";
 
-import { mockCoverSvg } from "./network-mocks";
+import { mockCoverSvg } from "../mock/network-mocks";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://placehold.co/**", (route) =>
@@ -145,6 +145,9 @@ test("demo readers can use every library tab, edit reviews, follow, and inspect 
   await page.getByRole("button", { name: "Completed", exact: true }).click();
   await expect(page.getByRole("article")).toHaveCount(1);
   await page.getByRole("button", { name: /^Bookmarks/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "Saved for later" }),
+  ).toBeVisible();
   const bookmarked = await page.getByRole("article").count();
   await page
     .getByRole("button", { name: /Remove bookmark for/ })

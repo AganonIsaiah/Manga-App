@@ -1,0 +1,58 @@
+@if (!store.ready()) {
+<manga-service-notice
+  [error]="store.homeError() || store.accountError()"
+  [label]="
+          store.homeLoading() ? 'Loading home…' : 'Loading your library…'
+        "
+  (retry)="retry()"
+/>
+} @else { @if (store.saveError(); as error) {
+<div class="flex items-center gap-3 text-sm text-orange-200" role="alert">
+  <p>{{ error.message }}</p>
+  <button type="button" (click)="store.retrySave()">Retry save</button>
+</div>
+}
+<div class="home relative min-h-0 flex-1 w-full px-2">
+  <div class="absolute inset-x-2 top-0 z-50 flex justify-center">
+    <nav
+      aria-label="Home navigation"
+      class="primary-border primary-clr flex home-width items-center justify-between rounded-full px-3 py-2"
+    >
+      @for (item of navigation; track item.tab) {
+      <a
+        [routerLink]="
+                  item.tab === 'library' && !store.auth.username()
+                    ? '/login'
+                    : '/home'
+                "
+        [queryParams]="params(item.tab)"
+        class="navbar-btn"
+        [attr.aria-current]="tab() === item.tab ? 'page' : null"
+        ><svg
+          [lucideIcon]="
+                    item.tab === 'library' && !store.auth.username()
+                      ? icons.LogIn
+                      : item.icon
+                  "
+          [size]="16"
+          aria-hidden="true"
+        ></svg
+        ><span
+          >{{ item.tab === "library" && !store.auth.username() ? "Sign in" :
+          item.label }}</span
+        ></a
+      >
+      }
+    </nav>
+  </div>
+  <div class="h-full min-h-0 flex flex-col items-center justify-center pt-16">
+    @switch (tab()) { @case ("library") {
+    <manga-library />
+    } @case ("search") {
+    <manga-search />
+    } @default {
+    <manga-feed />
+    } }
+  </div>
+</div>
+}

@@ -1,0 +1,157 @@
+<div class="profile-content">
+  <div class="flex flex-col gap-8 min-w-0">
+    <section>
+      <div class="section-heading">
+        <h2 class="text-lg font-semibold">Favourite manga</h2>
+        <span class="text-xs text-slate-500">The ones that stay with you</span>
+      </div>
+      <div class="favourites-grid mt-3">
+        @for (m of favourites(); track m.title; let i = $index) {
+        <article class="favourite-tile">
+          <div
+            class="favourite-cover"
+            [style.background-image]="cover(m.cover_url)"
+            role="img"
+            [attr.aria-label]="m.title + ' cover'"
+          >
+            <span class="favourite-rank">0{{ i + 1 }}</span>
+          </div>
+          <h3 class="text-xs font-medium mt-2">{{ m.title }}</h3>
+          <p class="text-[11px] text-slate-500 mt-1">
+            {{ m.authors.join(", ") }}
+          </p>
+        </article>
+        }
+      </div>
+    </section>
+    <section>
+      <div class="section-heading">
+        <h2 class="text-lg font-semibold">Recently read</h2>
+        <span class="text-xs text-slate-500">A little reading history</span>
+      </div>
+      <div class="flex flex-col mt-3">
+        @for (m of recent(); track m.title) {
+        <article class="recent-row">
+          <div
+            class="recent-cover"
+            [style.background-image]="cover(m.cover_url)"
+            role="img"
+            [attr.aria-label]="m.title + ' cover'"
+          ></div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-medium">{{ m.title }}</h3>
+            <p class="text-xs text-slate-500 mt-1">
+              Chapter {{ m.current_chapter }}
+            </p>
+          </div>
+          <span class="text-xs text-slate-500"
+            >{{ m.days_last_read === 0 ? "Today" : m.days_last_read === 1 ?
+            "Yesterday" : m.days_last_read + " days ago" }}</span
+          >
+        </article>
+        }
+      </div>
+    </section>
+    <section>
+      <div class="section-heading">
+        <h2 class="text-lg font-semibold">Favourite panels</h2>
+        <span class="text-xs text-slate-500">Moments worth keeping</span>
+      </div>
+      <div class="panels-grid mt-3">
+        @for (item of favouritePanels(); track item.id) {
+        <button
+          class="panel-tile"
+          (click)="panel.set(item)"
+          [attr.aria-label]="'View favourite panel from ' + item.title"
+        >
+          <img
+            width="600"
+            height="450"
+            [src]="item.image"
+            [alt]="item.description"
+          /><span
+            >{{ item.title }}<small>Chapter {{ item.chapter }}</small></span
+          >
+        </button>
+        }
+      </div>
+    </section>
+  </div>
+  <aside class="flex flex-col gap-7">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Ratings</h2>
+        <span class="text-sm text-tertiary font-semibold"
+          >{{ details().ratings.total_ratings }} total</span
+        >
+      </div>
+      <div class="grid grid-cols-5 gap-3 pt-2 pb-2">
+        @for (count of counts(); track $index; let i = $index) {
+        <div
+          class="flex min-w-0 flex-col items-center gap-2"
+          [attr.aria-label]="
+              i +
+              1 +
+              ' ' +
+              (i === 0 ? 'star' : 'stars') +
+              ': ' +
+              count +
+              ' ratings'
+            "
+        >
+          <span class="text-xs font-medium" aria-hidden="true"
+            >{{ count }}</span
+          >
+          <div class="flex h-24 w-full items-end" aria-hidden="true">
+            <div
+              class="w-full rounded-t-sm bg-orange-300"
+              [style.height.%]="(count / maximum()) * 100"
+            ></div>
+          </div>
+          <span class="flex items-center gap-1 text-xs" aria-hidden="true"
+            >{{ i + 1 }}<svg
+              [lucideIcon]="icons.Star"
+              class="size-3 fill-orange-300 text-orange-300"
+            ></svg
+          ></span>
+        </div>
+        }
+      </div>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold mb-2">Bio</h2>
+      <p class="text-sm text-slate-400 leading-relaxed">{{ details().bio }}</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 p-4">
+      <p class="eyebrow">READING MOOD</p>
+      <p class="text-sm text-orange-200 mt-2">{{ readingMood() }}</p>
+    </div>
+  </aside>
+  @if (panel(); as selected) {
+  <dialog mangaModal label="Favourite panel" (dismissed)="panel.set(null)">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="font-semibold">{{ selected.title }}</h2>
+      <button
+        class="action-icon"
+        (click)="panel.set(null)"
+        aria-label="Close panel"
+      >
+        <svg [lucideIcon]="icons.X" [size]="18"></svg>
+      </button>
+    </div>
+    <img
+      width="600"
+      height="450"
+      class="w-full rounded-lg"
+      [src]="selected.image"
+      [alt]="selected.description"
+    />
+    <p class="text-sm text-slate-400 mt-3">
+      Chapter {{ selected.chapter }} · Favourite panel
+    </p>
+    <p class="text-xs text-slate-500 mt-2">
+      Illustrative artwork for the demo collection.
+    </p>
+  </dialog>
+  }
+</div>

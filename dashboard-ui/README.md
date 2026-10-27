@@ -1,85 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Manga frontend
 
-## Getting Started
+Angular **22.2.3** with standalone components, signals, Angular Router, reactive login forms, and Tailwind CSS 4. The existing design, phone layouts, permanent navigation bar, and mock service contracts are preserved.
 
-First, run the development server:
+Use Node **22.22.3+** on the 22.x line, **24.15+** on 24.x, or 26+.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. `/` opens `/login`; `/home` allows guest browsing. `npm run build` creates the deployable SPA in `dist/dashboard-ui/browser`. Configure your static host to serve `index.html` for application routes such as `/home` and `/login`. `npm start` runs Angular's preview server; use a static host for deployment.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Each component has a named folder containing its TypeScript, external HTML template, and unit test. Application data files are grouped centrally:
 
-## Learn More
+```text
+src/
+  main.ts
+  styles.css
+  environments/environment.ts
+  app/
+    app.ts, app.html, app.spec.ts
+    app.config.ts, app.routes.ts, app-flows.spec.ts
+    config/                 # API flags and configuration
+    services/               # Auth, home, persistence, HTTP; .services.ts
+    models/                 # Shared typed contracts; .model.ts
+    mocks/                  # Runtime fixtures; *-mocks.ts
+    features/
+      auth/login/           # login.ts, login.html, login.spec.ts
+      home/                 # home.ts, home.html, home.spec.ts
+        for-you/
+          feed-card/
+        search/
+        library/profile/
+        manga-card/
+        manga-actions/
+        people/
+    shared/
+      modal/
+      service-notice/
+      icons.ts
+```
 
-To learn more about Next.js, take a look at the following resources:
+Components use suffix-free filenames (`search.ts` / `search.html`), services use `.services.ts`, models use `.model.ts`, and unit tests use `.spec.ts`. Angular CLI component defaults create a named folder, external template, and colocated test. Test-only fixtures live in `tests/mock`. The application uses Angular throughout.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Demo and data services
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Choose **Use demo account**, or sign in with `reader@manga.demo` (username `aganon33`) and password `manga-demo`. Remember me uses local storage; otherwise the session is tab-scoped. Sessions expire after seven days, and passwords are never persisted. Password recovery clearly reports that no email was sent.
 
-## Deploy on Vercel
+Guests can discover manga, search titles/authors/genres/descriptions or `@username`, and view public reader profiles. Personal libraries and mutations require demo sign-in. The reading preview tracks chapter progress; actual manga pages await a reader API. Bookmarks, following, progress, and reviews are shared across screens and persisted per account at `manga-library-v2:<username>`. Remove that key to reset a library.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+All fixtures remain in `src/app/mocks/auth-mocks.ts` and `src/app/mocks/home-mocks.ts`. Components never import them. `AuthService`, `LibraryState`, and `HomeStore` are root-provided Angular services. `LibraryState` owns private writable signals and exposes read-only shelves and a computed profile; library changes go through its commands. `HomeStore` coordinates account loading, sign-in checks, and ordered saves. `AuthService` owns session and username signals, session expiry, and native cross-tab storage synchronization, with subscriptions cleaned up through Angular's lifecycle.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`HomeApi` implements the typed data methods in `home.services.ts` directly, returning cold RxJS `Observable<T>` streams for both mocks and HTTP. It injects `ApiClient`, `BrowserStorage`, and `LibraryState`; there is no free-function API wrapper or module-global session. `ApiClient` uses Angular `HttpClient`, configured in `app.config.ts`, and maps HTTP failures to the shared `ApiError` model. `API_CONFIG` and `AUTH_CONFIG` are injection tokens whose defaults retain the current mock flags. Reads are unsubscribed when superseded or destroyed; loading flags use `finalize`, home reads combine with `forkJoin`, and library writes are serialized with `concatMap` so errors do not stop later saves. Sign-in and recovery use Observable mock timers, and the login component handles results through RxJS pipelines. Tests use `TestBed` and `HttpTestingController` to replace the HTTP backend. Browser storage uses the injected document and platform rather than assuming a browser is always available.
 
-### Frontend demo
+`src/app/config/api.config.ts` retains **`USE_MOCKS = true`**. Mock services return independent copies of fixtures. The API integration points remain:
 
-The home screens use mock manga and readers; no backend is required. Search a title, author, genre, or description, or enter `@manga_mira` to find a reader. The Readers result tab also searches names and bios. Reader profiles link from search and follower/following lists.
-
-Bookmarks, follows, chapter progress, and review edits are shared across the app and saved in browser local storage (`manga-library-v2:<username>`). Clear that account’s key to reset the demo. Guest visits never load a personal library. Reading opens a preview with chapter controls; actual manga pages await the backend. Favourite panels use local illustrative SVG fixtures, with a larger preview on selection.
-
-Validation: `npm run lint` and `npm run build`. The layout supports narrow phone screens, with responsive shelves and safe viewport sizing. Keyboard users can close preview dialogs with Escape.
-
-### Login demo
-
-`/` opens `/login`. Sign in using **Use demo account**, or enter `reader@manga.demo` (username `aganon33`) and password `manga-demo`. The form includes password visibility, loading/error states, remember me, and mock password recovery. Password recovery explicitly reports that no email was sent. Guest browsing remains available; this frontend session is a demo, not a backend authorization boundary.
-
-Without Remember me, the session is stored for the browser tab; enabling it uses local storage. Sessions expire after seven days. Passwords are never stored. Library includes sign-in/sign-out controls, and a successful sign-in returns to the requested home screen.
-
-Auth fixtures and simulated responses live in `src/features/auth/auth-mocks.ts`, behind `auth.service.ts`. Home fixtures, reader profiles, panels, and initial library state live in `src/features/home/home.api-mocks.ts`; only service files import these fixtures. Components receive data through `HomeProvider` or typed service methods, with loading, error, and retry states. Types and state handling are separate from fixtures.
-
-`NEXT_PUBLIC_AUTH_MODE` defaults to mock mode. Setting it to `backend` disables demo login and fails with an unavailable message until a real adapter is connected in `auth.service.ts`. Restart the development server after changing this build-time flag.
-
-### Tests and continuous integration
-
-- `npm test` runs all unit and component tests once; `npm run test:watch` reruns them as you edit.
-- `npm run test:coverage` generates coverage and enforces minimum line/statement (80%), function (75%), and branch (70%) coverage.
-- `npm run build && npm run test:e2e` runs real Chromium checks against the production build. Install Chromium once with `npx playwright install chromium`. The browser suite starts an isolated server on port 3100 automatically.
-
-Tests cover authentication and guest access, navigation, recommendation controls, search and filters, reader discovery, library tabs, chapter progress, bookmarks, review editing, follows, panel dialogs, persistence, malformed saved data, and scroll/touch behavior. Responsive browser tests check 320, 390, 600, 768, and 1440 pixel widths, including horizontal overflow and the number of manga columns.
-
-`.github/workflows/frontend-tests.yml` runs lint, unit/component tests with coverage, a production build, and browser tests on every push and pull request, and can also be started manually in GitHub Actions. Coverage and browser reports are uploaded as artifacts. No credentials or backend services are required.
-
-Guests see a Sign in navigation entry and an empty library prompt. Only an authenticated demo session loads the sample personal profile. Reading, bookmarks, follows, and review changes require sign-in; browsing manga and public reader profiles remains available to guests. Mock authentication remains a frontend preview, not a production authorization mechanism.
-
-
-### Data services and API handoff
-
-`src/config/api.config.ts` defines **`USE_MOCKS = true`**. Leave it enabled while the backend is unavailable. All home data reads and library saves go through `src/features/home/home.service.ts`; mock responses are cloned so UI changes cannot mutate shared fixtures. Browser storage is used only by the mock service adapter, with separate keys per account.
-
-| Service method | Supplies |
+| Method | Data |
 | --- | --- |
-| `getHomeData()` | The shared catalog, recommendations, reader directory, and suggestion pills |
-| `getForYouFeed()` / `getMangaCatalog()` | Recommendation and manga data |
-| `getSearchFeed({ query, genre, status, sort })` | Filtered and sorted manga results |
-| `getReaders({ query, usernames })` | Reader search and follower/following lists |
-| `getSearchSuggestions()` | Search suggestion pills |
-| `getUserProfile(username)` | Profile details, library state, favourite panels, reading mood, and avatar colour |
-| `saveUserLibrary(username, state)` | Reading progress, bookmarks, follows, and review updates |
+| `getHomeData()` | Catalog, recommendations, readers, suggestions |
+| `getForYouFeed()` / `getMangaCatalog()` | Manga feeds |
+| `getSearchFeed({ query, genre, status, sort })` | Filtered and sorted search results |
+| `getReaders({ query, usernames })` | Reader search and connections |
+| `getSearchSuggestions()` | Search pills |
+| `getUserProfile(username)` | Profile, library, favourite panels, mood, avatar |
+| `saveUserLibrary(username, state)` | Progress, bookmarks, following, reviews |
 
-When the API is ready, align the endpoint paths and response mappings in `home.service.ts`, set `NEXT_PUBLIC_API_BASE_URL` (default `/api`), and switch `USE_MOCKS` off. The HTTP branches use credentials, encoded route/query parameters, and HTTP error handling. The current endpoint paths are integration placeholders, not a claim that those backend routes already exist. Keep the service return types in `home.api-types.ts` stable so the components need no endpoint-specific changes. Connect the real authentication adapter in `auth.service.ts` at the same time; mock login is disabled when the shared flag is off.
+When the backend is ready, update endpoint paths and DTO mappings in `.services.ts` files, set `apiBaseUrl` in `src/environments/environment.ts`, implement the authentication adapter in `auth.services.ts`, and disable `USE_MOCKS`. `authMode: 'backend'` also disables mock authentication. These are build-time settings. HTTP failures propagate to retry states rather than returning demo data. Library saves run in order, failed saves retain visible edits and offer Retry save, and stale search/profile responses cannot replace newer results.
 
-Library changes save in order through the service. A failed save keeps the visible changes and offers **Retry save**. Pending requests cannot replace results for a newer search. Tests cover mock and HTTP branches, retries, stale responses, and persistence.
+## Checks
+
+```bash
+npm run lint
+npm test
+npm run test:coverage
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+`npm run test:watch` watches Angular unit/component tests. Coverage enforces 80% statements/lines, 75% functions, and 70% branches; fixtures are excluded. Angular's native Vitest runner tests services, state, login, home, search, public profiles, library tabs, dialogs, and mutations. Playwright starts an isolated Angular server on port 3100 and checks browser flows, scroll snapping, touch/arrow navigation, fixed navigation, and responsive layouts at 320–1440px, including short screens.
+
+`.github/workflows/frontend-tests.yml` runs lint, coverage, production build, and Chromium checks automatically on pushes and pull requests, and supports manual dispatch. Coverage and browser reports are uploaded as artifacts. No backend or credentials are required.

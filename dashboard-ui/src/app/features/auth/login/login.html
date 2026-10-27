@@ -1,0 +1,152 @@
+<main class="auth-page">
+  <header class="auth-header">
+    <a routerLink="/home" class="auth-brand" aria-label="Manga home"
+      ><svg [lucideIcon]="icons.BookOpen" [size]="18" aria-hidden="true"></svg
+      ><span>Manga</span></a
+    ><a routerLink="/home" class="auth-text-link"
+      >Browse as guest
+      <svg [lucideIcon]="icons.ArrowRight" [size]="14" aria-hidden="true"></svg
+    ></a>
+  </header>
+  <div class="auth-main">
+    <section class="auth-form-shell" aria-labelledby="login-title">
+      @if (reset()) {
+      <button
+        type="button"
+        class="auth-back auth-text-link"
+        (click)="changeView(false)"
+        [disabled]="pending()"
+      >
+        <svg [lucideIcon]="icons.ArrowLeft" [size]="14" aria-hidden="true"></svg
+        >Back to sign in
+      </button>
+      }
+      <h1 id="login-title" #heading tabindex="-1">
+        {{ reset() ? "Forgot your password?" : "Welcome back" }}
+      </h1>
+      <p class="auth-subtitle">
+        {{ reset() ? "Enter the email address linked to your account." : "Sign
+        in to pick up where you left off." }}
+      </p>
+      <form
+        ngNativeValidate
+        [formGroup]="reset() ? recovery : form"
+        (ngSubmit)="submit()"
+        [attr.aria-busy]="pending()"
+      >
+        <fieldset [disabled]="pending()" class="auth-fields">
+          @if (reset()) {
+          <label class="auth-label" for="reset-email"
+            >Email address<input
+              id="reset-email"
+              class="auth-input"
+              type="email"
+              name="email"
+              autocomplete="email"
+              required
+              maxlength="254"
+              placeholder="you@example.com"
+              [formControl]="recovery.controls.email"
+              (input)="clearMessages()"
+          /></label>
+          } @else {
+          <label class="auth-label" for="login-identifier"
+            >Email or username<input
+              id="login-identifier"
+              class="auth-input"
+              name="username"
+              autocomplete="username"
+              autocapitalize="none"
+              [spellcheck]="false"
+              required
+              maxlength="254"
+              placeholder="Email or username"
+              [formControl]="form.controls.identifier"
+              (input)="clearMessages()"
+          /></label>
+          <div>
+            <label class="auth-label" for="login-password">Password</label>
+            <div class="auth-password">
+              <input
+                id="login-password"
+                class="auth-input"
+                name="password"
+                autocomplete="current-password"
+                [type]="visible() ? 'text' : 'password'"
+                required
+                maxlength="256"
+                placeholder="Your password"
+                [formControl]="form.controls.password"
+                (input)="clearMessages()"
+              /><button
+                type="button"
+                class="auth-password-toggle"
+                [attr.aria-label]="
+                    visible() ? 'Hide password' : 'Show password'
+                  "
+                [attr.aria-pressed]="visible()"
+                aria-controls="login-password"
+                (click)="visible.set(!visible())"
+              >
+                <svg
+                  [lucideIcon]="visible() ? icons.EyeOff : icons.Eye"
+                  [size]="17"
+                  aria-hidden="true"
+                ></svg>
+              </button>
+            </div>
+          </div>
+          <div class="auth-options">
+            <label class="auth-remember"
+              ><input
+                type="checkbox"
+                name="remember"
+                [formControl]="form.controls.remember"
+              />Remember me</label
+            ><button
+              type="button"
+              class="auth-text-link"
+              (click)="changeView(true)"
+            >
+              Forgot password?
+            </button>
+          </div>
+          } @if (error()) {
+          <p class="auth-error" role="alert">{{ error() }}</p>
+          } @if (message()) {
+          <p class="auth-message" role="status">{{ message() }}</p>
+          }
+          <button class="action-primary auth-submit" type="submit">
+            @if (pending()) {
+            <svg
+              [lucideIcon]="icons.LoaderCircle"
+              class="auth-spinner"
+              [size]="16"
+              aria-hidden="true"
+            ></svg
+            >{{ reset() ? "Sending…" : "Signing in…" }} } @else { {{ reset() ?
+            "Send reset link" : "Sign in" }}<svg
+              [lucideIcon]="icons.ArrowRight"
+              [size]="16"
+              aria-hidden="true"
+            ></svg>
+            }
+          </button>
+        </fieldset>
+      </form>
+      @if (demoEnabled) {
+      <div class="auth-demo">
+        <p>Try it out while accounts are being built.</p>
+        <button
+          class="action-secondary"
+          [disabled]="pending()"
+          (click)="submit(true)"
+        >
+          Use demo account
+        </button>
+      </div>
+      }
+    </section>
+  </div>
+  <footer class="auth-footer">Your stories, all in one place.</footer>
+</main>

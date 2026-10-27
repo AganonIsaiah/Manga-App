@@ -1,0 +1,50 @@
+@if (!items().length) {
+<p>No recommendations available.</p>
+} @else {
+<div
+  #scroller
+  (scroll)="onScroll()"
+  class="relative mx-auto h-full min-h-0 w-full snap-y snap-mandatory overflow-y-auto scrollbar-none! rounded-lg sm:max-w-[415px]"
+  aria-label="Manga recommendations"
+  data-recommendation-feed
+>
+  <div class="relative h-full w-full">
+    @for (index of indexes(); track index) {
+    <div
+      class="relative flex h-full w-full shrink-0 snap-start flex-col items-center justify-center gap-3"
+    >
+      @if (visible(index)) {
+      <manga-feed-card [details]="items()[index % items().length]" />
+      }
+    </div>
+    }
+  </div>
+</div>
+<div>
+  <aside
+    class="absolute top-1/2 left-[calc(50%+205px)] hidden w-16 -translate-y-1/2 flex-col items-center text-slate-400 sm:flex"
+    aria-label="Recommendation scroller"
+  >
+    <button
+      type="button"
+      (click)="move(-1)"
+      class="btn-transitions mb-5 rounded-full p-2 hover:text-white hover:bg-slate-700"
+      aria-label="Previous recommendation"
+    >
+      <svg [lucideIcon]="icons.ChevronUp" [size]="15" aria-hidden="true"></svg>
+    </button>
+    <button
+      type="button"
+      (click)="move(1)"
+      class="btn-transitions mt-5 rounded-full p-2 hover:text-white hover:bg-slate-700"
+      aria-label="Next recommendation"
+    >
+      <svg
+        [lucideIcon]="icons.ChevronDown"
+        [size]="15"
+        aria-hidden="true"
+      ></svg>
+    </button>
+  </aside>
+</div>
+}
