@@ -3,8 +3,8 @@ import type { Type } from "@angular/core";
 import { TestBed, TestComponentRenderer } from "@angular/core/testing";
 import { ActivatedRoute, provideRouter, type Params } from "@angular/router";
 import { expect } from "vitest";
-import { AuthService } from "../src/app/services/auth.services";
-import { HomeStore } from "../src/app/services/home-store.services";
+import { AuthService } from "../src/app/services/auth/auth.services";
+import { HomeStore } from "../src/app/services/home-store/home-store.services";
 import { createRendererMock } from "./mock/renderer-mocks";
 import { createRouteMock } from "./mock/route-mocks";
 

@@ -6,10 +6,10 @@ import { provideRouter, Router } from "@angular/router";
 import { RouterTestingHarness } from "@angular/router/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Home } from "./features/home/home";
-import { Login } from "./features/auth/login/login";
-import { HomeStore } from "./services/home-store.services";
-import { HomeApi } from "./services/home.services";
-import { AuthService } from "./services/auth.services";
+import { Login } from "./features/login/login";
+import { HomeStore } from "./services/home-store/home-store.services";
+import { HomeApi } from "./services/home/home.services";
+import { AuthService } from "./services/auth/auth.services";
 import { mockLoginCredentials } from "./mocks/auth-mocks";
 import {
   catalog,
@@ -91,7 +91,7 @@ describe("Angular login", () => {
       "doesn’t match",
     );
   });
-  it("signs in with the service credentials and remembered session", async () => {
+  it("signs in with the service credentials without storing auth in browser storage", async () => {
     await open("/login");
     const component = harness.routeDebugElement!.componentInstance as Login;
     component.form.setValue({ ...mockLoginCredentials, remember: true });
@@ -101,7 +101,8 @@ describe("Angular login", () => {
     expect(TestBed.inject(HomeStore).auth.username()).toBe(
       mockProfileDetails.username,
     );
-    expect(localStorage.length).toBeGreaterThan(0);
+    expect(localStorage.getItem("manga-session-v1")).toBeNull();
+    expect(sessionStorage.getItem("manga-session-v1")).toBeNull();
   });
   it("uses an honest mock password recovery message and supports returning to login", async () => {
     await open("/login");
@@ -126,6 +127,7 @@ describe("Angular home and search", () => {
   });
   it("shows recommendation details, keeps rapid arrows ordered, and settles after resize", async () => {
     await open("/home");
+    await click(`Show details for ${catalog[0].title}`);
     expect(root().textContent).toContain(
       `Story: ${catalog[0].authors.join(", ")}`,
     );

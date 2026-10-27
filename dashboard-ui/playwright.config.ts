@@ -11,10 +11,20 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: "npm run start -- --host 127.0.0.1 --port 3100",
-    url: "http://127.0.0.1:3100/login",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: "../backend/.venv/bin/python -m tests.serve",
+      cwd: "../backend",
+      url: "http://127.0.0.1:8101/openapi.json",
+      reuseExistingServer: false,
+      timeout: 60_000,
+    },
+    {
+      command:
+        "npm run start -- --host 127.0.0.1 --port 3100 --proxy-config proxy.e2e.conf.json",
+      url: "http://127.0.0.1:3100/login",
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
+  ],
 });

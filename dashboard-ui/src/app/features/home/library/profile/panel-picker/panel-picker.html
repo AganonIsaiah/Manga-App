@@ -1,0 +1,70 @@
+<div class="panel-picker">
+  <p class="text-sm text-slate-400">
+    Choose a few moments to keep on your profile.
+  </p>
+  <label class="sr-only" for="panel-search">Search available panels</label>
+  <input
+    id="panel-search"
+    class="library-input w-full"
+    type="search"
+    placeholder="Search by manga title…"
+    [ngModel]="query()"
+    (ngModelChange)="query.set($event)"
+  />
+  @if(loading()||error()){
+  <manga-service-notice
+    [error]="error()"
+    label="Loading panels…"
+    (retry)="load()"
+  />
+  }@else{
+  <div class="panel-picker-grid" aria-label="Available panels">
+    @for(item of visible();track item.id){
+    <button
+      type="button"
+      class="panel-choice"
+      [disabled]="existingIds().includes(item.id)"
+      [attr.aria-label]="'Select panel from ' + item.title + ', chapter ' + item.chapter"
+      [attr.aria-pressed]="selectedIds().includes(item.id)"
+      (click)="toggle(item.id)"
+    >
+      <span class="panel-choice-art"
+        ><img
+          width="600"
+          height="450"
+          [src]="item.image"
+          [alt]="item.description"
+        />@if(existingIds().includes(item.id)){<span class="panel-choice-mark"
+          ><svg [lucideIcon]="icons.Check" [size]="14"></svg>Saved</span
+        >}@else if(selectedIds().includes(item.id)){<span
+          class="panel-choice-mark"
+          ><svg [lucideIcon]="icons.Check" [size]="16"></svg></span
+        >}</span
+      >
+      <span class="block p-2.5 text-xs font-medium break-words"
+        >{{item.title}}<small class="block mt-1 text-slate-500"
+          >Chapter {{item.chapter}}</small
+        ></span
+      >
+    </button>
+    }@empty{
+    <p class="col-span-full empty-state">No panels match that title.</p>
+    }
+  </div>
+  }
+  <div class="panel-picker-footer">
+    <p class="text-xs text-slate-400" role="status">
+      {{selected().length}} selected
+    </p>
+    <button
+      type="button"
+      class="action-primary panel-picker-add"
+      [disabled]="!selected().length"
+      (click)="add()"
+    >
+      <svg [lucideIcon]="icons.Plus" [size]="15" aria-hidden="true"></svg
+      >{{selected().length?'Add '+selected().length+(selected().length===1?'
+      panel':' panels'):'Add selected'}}
+    </button>
+  </div>
+</div>

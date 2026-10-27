@@ -38,6 +38,7 @@
 <div class="library-shell">
   <div class="library-session">
     @if (store.auth.username()) {
+    @if(signOutError()){<p class="auth-error" role="alert">{{signOutError()}}</p>}
     <button class="auth-text-link" (click)="signOut()">
       <svg [lucideIcon]="icons.LogOut" [size]="13" aria-hidden="true"></svg>Sign
       out
@@ -116,7 +117,10 @@
   @if (tab() === "profile") {
   <manga-profile
     [details]="p"
-    [favouritePanels]="v.favouritePanels"
+    [favouritePanels]="isPublic() ? v.favouritePanels : store.library.favouritePanels()"
+    [editable]="!isPublic()"
+    (panelsAdded)="store.addFavouritePanels($event)"
+    (panelRemoved)="store.removeFavouritePanel($event)"
     [readingMood]="v.readingMood"
   />
   } @else {

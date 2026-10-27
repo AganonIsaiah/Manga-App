@@ -6,7 +6,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { HomeStore } from "../../services/home-store.services";
+import { HomeStore } from "../../services/home-store/home-store.services";
 import { Icons, LucideDynamicIcon } from "../../shared/icons";
 import { ServiceNotice } from "../../shared/service-notice/service-notice";
 import { ForYou } from "./for-you/for-you";

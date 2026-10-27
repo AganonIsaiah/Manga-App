@@ -1,0 +1,40 @@
+<main class="auth-page">
+  <header class="auth-header">
+    <a routerLink="/home" class="auth-brand" aria-label="Manga home"
+      ><svg [lucideIcon]="icons.BookOpen" [size]="18" aria-hidden="true"></svg
+      ><span>Manga</span></a
+    >
+    <a routerLink="/login" class="auth-text-link">Sign in</a>
+  </header>
+  <div class="auth-main">
+    <section class="auth-form-shell" aria-labelledby="confirm-title">
+      <h1 id="confirm-title">Confirm your email</h1>
+      @if (complete()) {
+      <p class="auth-message" role="status">
+        Your email is confirmed. Welcome to Manga.
+      </p>
+      <a routerLink="/home" class="action-primary auth-submit"
+        >Start exploring</a
+      >
+      } @else if (!token) {
+      <p class="auth-error" role="alert">
+        This confirmation link is invalid. Use the link in your signup email.
+      </p>
+      } @else {
+      <p class="auth-subtitle">One last step before your next story.</p>
+      @if (error()) {
+      <p class="auth-error" role="alert">{{error()}}</p>
+      }
+      <button
+        class="action-primary auth-submit"
+        type="button"
+        [disabled]="pending()"
+        (click)="confirm()"
+      >
+        {{pending() ? 'Confirming…' : 'Confirm email'}}
+      </button>
+      }
+    </section>
+  </div>
+  <footer class="auth-footer">Your stories, all in one place.</footer>
+</main>

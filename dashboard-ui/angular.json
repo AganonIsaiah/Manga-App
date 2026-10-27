@@ -56,7 +56,10 @@
               "buildTarget": "dashboard-ui:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -92,7 +95,9 @@
         "@schematics/angular:service": {
           "type": "services",
           "addTypeToClassName": false,
-          "injectable": true
+          "injectable": true,
+          "flat": false,
+          "skipTests": false
         },
         "@schematics/angular:interface": {
           "type": "model"

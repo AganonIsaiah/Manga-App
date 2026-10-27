@@ -1,0 +1,143 @@
+<main class="auth-page">
+  <header class="auth-header">
+    <a routerLink="/home" class="auth-brand" aria-label="Manga home"
+      ><svg [lucideIcon]="icons.BookOpen" [size]="18" aria-hidden="true"></svg
+      ><span>Manga</span></a
+    >
+    <a routerLink="/home" class="auth-text-link"
+      >Browse as guest
+      <svg [lucideIcon]="icons.ArrowRight" [size]="14" aria-hidden="true"></svg
+    ></a>
+  </header>
+  <div class="auth-main">
+    <section class="auth-form-shell" aria-labelledby="signup-title">
+      <h1 id="signup-title">Make room for your stories</h1>
+      <p class="auth-subtitle">
+        Create an account to build your library and find your next read.
+      </p>
+      @if (message()) {
+      <p class="auth-message" role="status">{{ message() }}</p>
+      <a
+        class="action-primary auth-submit"
+        routerLink="/login"
+        [queryParams]="{next: destination}"
+        >Continue to sign in
+        <svg
+          [lucideIcon]="icons.ArrowRight"
+          [size]="16"
+          aria-hidden="true"
+        ></svg
+      ></a>
+      } @else { @if (auth.useMocks) {
+      <p class="auth-subtitle">
+        Account creation is a preview for now. Your details won’t be saved.
+      </p>
+      }
+      <form
+        ngNativeValidate
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        [attr.aria-busy]="pending()"
+      >
+        <fieldset class="auth-fields" [disabled]="pending()">
+          <label class="auth-label" for="signup-name"
+            >Display name<input
+              id="signup-name"
+              class="auth-input"
+              autocomplete="name"
+              required
+              maxlength="80"
+              placeholder="Your name"
+              [formControl]="form.controls.name"
+              (input)="clearMessages()"
+          /></label>
+          <label class="auth-label" for="signup-username"
+            >Username<input
+              id="signup-username"
+              class="auth-input"
+              autocomplete="username"
+              autocapitalize="none"
+              [spellcheck]="false"
+              required
+              pattern="[a-zA-Z0-9_]{3,24}"
+              title="3–24 letters, numbers or underscores"
+              maxlength="24"
+              placeholder="Choose a username"
+              [formControl]="form.controls.username"
+              (input)="clearMessages()"
+          /></label>
+          <label class="auth-label" for="signup-email"
+            >Email address<input
+              id="signup-email"
+              class="auth-input"
+              type="email"
+              autocomplete="email"
+              required
+              maxlength="254"
+              placeholder="you@example.com"
+              [formControl]="form.controls.email"
+              (input)="clearMessages()"
+          /></label>
+          <div>
+            <label class="auth-label" for="signup-password">Password</label>
+            <div class="auth-password">
+              <input
+                id="signup-password"
+                class="auth-input"
+                autocomplete="new-password"
+                [type]="visible() ? 'text' : 'password'"
+                required
+                minlength="12"
+                maxlength="256"
+                placeholder="At least 12 characters"
+                [formControl]="form.controls.password"
+                (input)="clearMessages()"
+              />
+              <button
+                type="button"
+                class="auth-password-toggle"
+                [attr.aria-label]="visible() ? 'Hide password' : 'Show password'"
+                [attr.aria-pressed]="visible()"
+                aria-controls="signup-password"
+                (click)="visible.set(!visible())"
+              >
+                <svg
+                  [lucideIcon]="visible() ? icons.EyeOff : icons.Eye"
+                  [size]="17"
+                  aria-hidden="true"
+                ></svg>
+              </button>
+            </div>
+          </div>
+          @if (error()) {
+          <p class="auth-error" role="alert">{{ error() }}</p>
+          } @if (form.touched && form.invalid) {
+          <p class="auth-error" role="alert">
+            Enter your name, a valid email, a username with 3–24 letters,
+            numbers or underscores, and a password with at least 12 characters.
+          </p>
+          }
+          <button class="action-primary auth-submit" type="submit">
+            {{ pending() ? 'Creating…' : 'Create account' }}<svg
+              [lucideIcon]="pending() ? icons.LoaderCircle : icons.ArrowRight"
+              [class.auth-spinner]="pending()"
+              [size]="16"
+              aria-hidden="true"
+            ></svg>
+          </button>
+        </fieldset>
+      </form>
+      }
+      <p class="auth-subtitle">
+        Already have an account?
+        <a
+          routerLink="/login"
+          [queryParams]="{next: destination}"
+          class="auth-text-link"
+          >Sign in</a
+        >
+      </p>
+    </section>
+  </div>
+  <footer class="auth-footer">Your stories, all in one place.</footer>
+</main>

@@ -10,6 +10,7 @@ export type LibraryState = {
   progress: Record<string, number>;
   following: string[];
   reviews: Review[];
+  favouritePanels?: FavouritePanel[];
 };
 export type FavouritePanel = {
   id: string;

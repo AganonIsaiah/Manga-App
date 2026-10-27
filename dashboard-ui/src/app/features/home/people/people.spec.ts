@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { HomeApi } from "../../../services/home.services";
+import { HomeApi } from "../../../services/home/home.services";
 import { pendingRequest } from "../../../../../tests/mock/request-mocks";
 import { expect, it, vi } from "vitest";
 import { People } from "./people";

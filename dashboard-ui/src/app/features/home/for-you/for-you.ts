@@ -9,7 +9,7 @@ import {
   signal,
   viewChild,
 } from "@angular/core";
-import { HomeStore } from "../../../services/home-store.services";
+import { HomeStore } from "../../../services/home-store/home-store.services";
 import { FeedCard } from "./feed-card/feed-card";
 import { Icons, LucideDynamicIcon } from "../../../shared/icons";
 @Component({

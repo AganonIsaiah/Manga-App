@@ -6,7 +6,7 @@ import {
   input,
   signal,
 } from "@angular/core";
-import { HomeStore } from "../../../services/home-store.services";
+import { HomeStore } from "../../../services/home-store/home-store.services";
 import type { MangaDetails } from "../../../models/manga.model";
 import { Icons, LucideDynamicIcon } from "../../../shared/icons";
 import { Modal } from "../../../shared/modal/modal";

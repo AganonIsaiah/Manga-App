@@ -10,8 +10,8 @@ import {
   signal,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { HomeApi } from "../../../services/home.services";
-import { HomeStore } from "../../../services/home-store.services";
+import { HomeApi } from "../../../services/home/home.services";
+import { HomeStore } from "../../../services/home-store/home-store.services";
 import type { Reader } from "../../../models/home.model";
 import { ServiceNotice } from "../../../shared/service-notice/service-notice";
 @Component({

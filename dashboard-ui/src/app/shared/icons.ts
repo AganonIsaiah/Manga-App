@@ -1,5 +1,9 @@
 import {
   LucideBookOpen,
+  LucidePlus,
+  LucideCheck,
+  LucideUsersRound,
+  LucideFlipHorizontal2,
   LucideBookmark,
   LucideSearch,
   LucideCompass,
@@ -22,6 +26,10 @@ import {
 export { LucideDynamicIcon } from "@lucide/angular";
 export const Icons = {
   BookOpen: LucideBookOpen,
+  Plus: LucidePlus,
+  Check: LucideCheck,
+  UsersRound: LucideUsersRound,
+  FlipHorizontal2: LucideFlipHorizontal2,
   Bookmark: LucideBookmark,
   Search: LucideSearch,
   Compass: LucideCompass,

@@ -12,8 +12,8 @@ import {
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { HomeStore } from "../../../services/home-store.services";
-import { HomeApi } from "../../../services/home.services";
+import { HomeStore } from "../../../services/home-store/home-store.services";
+import { HomeApi } from "../../../services/home/home.services";
 import type { UserProfileData } from "../../../models/home-api.model";
 import type { Review } from "../../../models/home.model";
 import type { LibraryTab } from "../../../models/library.model";
@@ -187,9 +187,13 @@ export class Library {
     if (draft?.text.trim() && this.store.saveReview(draft))
       this.draft.set(null);
   }
+  readonly signOutError = signal("");
   signOut() {
-    this.store.auth.signOut();
-    void this.router.navigateByUrl("/login", { replaceUrl: true });
+    this.signOutError.set("");
+    this.store.auth.signOut().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => { void this.router.navigateByUrl("/login", { replaceUrl: true }); },
+      error: () => this.signOutError.set("Unable to sign out. Please try again."),
+    });
   }
   loginParams() {
     return { next: this.router.url };

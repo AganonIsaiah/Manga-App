@@ -1,3 +1,4 @@
+import { signInDemoReader } from "../mock/auth-mocks";
 import { expect, test, type Page } from "@playwright/test";
 import {
   catalog,
@@ -16,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 
 async function demoLogin(page: Page) {
   await page.goto("/login?next=%2Fhome%3Ftab%3Dlibrary");
-  await page.getByRole("button", { name: "Use demo account" }).click();
+  await signInDemoReader(page);
   await expect(
     page.getByRole("heading", { name: mockProfileDetails.name }),
   ).toBeVisible();
@@ -55,7 +56,7 @@ test("guests cannot see the default profile; demo login enables it and logout re
     .getByRole("link", { name: "Sign in" })
     .click();
   await expect(page).toHaveURL(/\/login/);
-  await page.getByRole("button", { name: "Use demo account" }).click();
+  await signInDemoReader(page);
   await expect(
     page.getByRole("heading", { name: mockProfileDetails.name }),
   ).toBeVisible();
@@ -79,7 +80,7 @@ test("guest manga actions return to the requested screen after demo login", asyn
     .getByRole("button", { name: `Bookmark ${catalog[2].title}`, exact: true })
     .click();
   await expect(page).toHaveURL(/\/login\?next=/);
-  await page.getByRole("button", { name: "Use demo account" }).click();
+  await signInDemoReader(page);
   await expect(page).toHaveURL(/tab=search&q=fantasy/);
   await expect(
     page.getByRole("heading", { name: "Search results" }),
@@ -226,10 +227,10 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.goto("/login");
     await page
-      .getByRole("button", { name: "Use demo account" })
+      .getByRole("button", { name: "Sign in", exact: true })
       .scrollIntoViewIfNeeded();
     await expect(
-      page.getByRole("button", { name: "Use demo account" }),
+      page.getByRole("button", { name: "Sign in", exact: true }),
     ).toBeInViewport();
     await page.goto("/home");
     await expect(

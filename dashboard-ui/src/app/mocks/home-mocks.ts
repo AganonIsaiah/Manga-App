@@ -10,12 +10,23 @@ export const mockForYouFeed: MangaApiResponse = {
   details: [
     {
       id: "manga-002",
-      title: "Neon Ronin",
+      title: "Neon Ronin: The Last Swordsman in a City That Forgot Tomorrow",
+      statistics: { rating: { average: 8.76, bayesian: 8.62 }, follows: 24862 },
+      panel: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock panel: a city skyline under the midnight moon",
+      },
+      back_cover: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock back-cover art: a city skyline under the midnight moon",
+      },
       genres: ["Action", "Sci-Fi", "Mystery"],
       description:
         "In a city governed by predictive machines, a disgraced swordsman investigates a crime the system insists never happened. Following a trail of missing memories, he discovers that the only future worth fighting for is one nobody can predict.",
       demographic: "Shounen",
-      authors: ["Haru Nakamura"],
+      authors: ["Haru Nakamura", "Akira Takahashi", "Mizuki Fujimoto"],
       artists: ["Emi Sato"],
       publication_year: "2022",
       status: "hiatus",
@@ -25,6 +36,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-003",
       title: "Tea at the Edge of Tomorrow",
+      statistics: { rating: { average: 8.4, bayesian: 8.15 }, follows: 18204 },
+      panel: {
+        image: "/panels/panel-1.svg",
+        description:
+          "Illustrative mock panel: a quiet café between moments in time",
+      },
+      back_cover: {
+        image: "/panels/panel-1.svg",
+        description:
+          "Illustrative mock back-cover art: a quiet café between moments in time",
+      },
       genres: ["Slice of Life", "Romance", "Sci-Fi"],
       description:
         "A quiet café serves customers from different points in time, but its owner breaks the rules when she falls for a visitor whose future has vanished.",
@@ -40,6 +62,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-004",
       title: "Iron Orchard",
+      statistics: { rating: { average: 9.07, bayesian: 8.83 }, follows: 69431 },
+      panel: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock panel: an enchanted forest beneath the moon",
+      },
+      back_cover: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock back-cover art: an enchanted forest beneath the moon",
+      },
       genres: ["Fantasy", "Action", "Supernatural"],
       description:
         "In a kingdom where weapons grow from enchanted trees, an apprentice gardener discovers a forbidden blade bearing the memories of a fallen queen.",
@@ -54,6 +87,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-005",
       title: "Paper Moon Detective Club",
+      statistics: { rating: { average: 8.14, bayesian: 7.92 }, follows: 12608 },
+      panel: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock panel: the city after dark, where a new mystery begins",
+      },
+      back_cover: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock back-cover art: the city after dark, where a new mystery begins",
+      },
       genres: ["Mystery", "Comedy", "School Life"],
       description:
         "Four students investigate supposedly paranormal incidents around their school and repeatedly uncover mysteries stranger than the ghosts they expected.",
@@ -69,6 +113,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-006",
       title: "Graveyard Shift Hero",
+      statistics: { rating: { average: 8.68, bayesian: 8.51 }, follows: 41820 },
+      panel: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock panel: a silent neighborhood during the graveyard shift",
+      },
+      back_cover: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock back-cover art: a silent neighborhood during the graveyard shift",
+      },
       genres: ["Comedy", "Action", "Supernatural"],
       description:
         "An exhausted convenience-store clerk becomes the neighborhood's reluctant protector whenever monsters emerge during his overnight shift.",
@@ -84,6 +139,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-007",
       title: "Cloud Harbor",
+      statistics: { rating: { average: 9.12, bayesian: 8.95 }, follows: 86540 },
+      panel: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock panel: an unfamiliar forest beyond the storm belt",
+      },
+      back_cover: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock back-cover art: an unfamiliar forest beyond the storm belt",
+      },
       genres: ["Adventure", "Fantasy", "Coming of Age"],
       description:
         "A runaway mechanic joins the crew of a flying cargo ship and searches the storm belt for an island erased from every official map.",
@@ -98,6 +164,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-008",
       title: "The Botanist and the Beast",
+      statistics: { rating: { average: 8.71, bayesian: 8.56 }, follows: 36724 },
+      panel: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock panel: moonlight falling across a mysterious garden",
+      },
+      back_cover: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock back-cover art: moonlight falling across a mysterious garden",
+      },
       genres: ["Romance", "Fantasy", "Drama"],
       description:
         "A royal botanist sent to cure a cursed prince learns that the strange flowers overtaking his castle are protecting him from something worse.",
@@ -113,6 +190,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-009",
       title: "Zero Signal",
+      statistics: { rating: { average: 8.93, bayesian: 8.72 }, follows: 53190 },
+      panel: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock panel: a city waiting for the final transmission",
+      },
+      back_cover: {
+        image: "/panels/panel-0.svg",
+        description:
+          "Illustrative mock back-cover art: a city waiting for the final transmission",
+      },
       genres: ["Thriller", "Sci-Fi", "Psychological"],
       description:
         "After every screen in Tokyo broadcasts a countdown with no known source, a radio engineer races to decode the final transmission before it reaches zero.",
@@ -127,6 +215,17 @@ export const mockForYouFeed: MangaApiResponse = {
     {
       id: "manga-010",
       title: "Summer of Small Gods",
+      statistics: { rating: { average: 9.01, bayesian: 8.85 }, follows: 47106 },
+      panel: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock panel: a moonlit grove at the edge of the village",
+      },
+      back_cover: {
+        image: "/panels/panel-2.svg",
+        description:
+          "Illustrative mock back-cover art: a moonlit grove at the edge of the village",
+      },
       genres: ["Slice of Life", "Supernatural", "Drama"],
       description:
         "During her final summer in a rural village, a teenager befriends the fading household gods that everyone else has forgotten.",
@@ -361,13 +460,24 @@ export const mockFavouritePanels: FavouritePanel[] = [
   },
 ];
 
+export const mockPanelSuggestions: FavouritePanel[] = [
+  ...mockFavouritePanels,
+  ...catalog.slice(3).map((manga, index) => ({
+    id: `panel-${manga.id}`,
+    title: manga.title,
+    chapter: [7, 18, 24, 16, 9, 28][index],
+    image: manga.panel!.image,
+    description: manga.panel!.description,
+  })),
+];
+
 export function getMockCurrentProfile(state: LibraryState): ProfileDetails {
   return {
     ...mockProfileDetails,
     following: state.following,
     recently_read: Object.fromEntries(
       Object.entries(state.progress)
-        .slice(-4)
+        .slice(-3)
         .reverse()
         .map(([id, chapter]) => {
           const manga = catalog.find((m) => m.id === id)!;
@@ -454,4 +564,19 @@ export function getMockReaders({
         .toLowerCase()
         .includes(query.trim().toLowerCase().replace(/^@/, "")),
   );
+}
+
+
+export function getMockEmptyAccount(user: import("../models/auth.model").AuthUser): import("../models/home-api.model").UserProfileData {
+  return {
+    profile: {
+      ...mockProfileDetails, name: user.name, username: user.username,
+      read_this_year: 0, read_all_time: 0, bio: "", header: "Your next story starts here.",
+      following: [], followers: [], favourite_manga: {}, recently_read: {},
+      ratings: { one_star: 0, two_stars: 0, three_stars: 0, four_stars: 0, five_stars: 0, total_ratings: 0 },
+      location: "", date_joined: "", account_age_months: 0,
+    },
+    state: { following: [], bookmarks: [], progress: {}, reviews: [], favouritePanels: [] },
+    favouritePanels: [], readingMood: "What will you read next?", avatarColor: "#d9aa9d",
+  };
 }
