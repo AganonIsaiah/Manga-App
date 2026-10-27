@@ -11,6 +11,10 @@ npm run dev
 
 Open http://localhost:3000. `/` opens `/login`; `/home` allows guest browsing. `npm run build` creates the deployable SPA in `dist/dashboard-ui/browser`. Configure your static host to serve `index.html` for application routes such as `/home` and `/login`. `npm start` runs Angular's preview server; use a static host for deployment.
 
+## Vercel deployment
+
+Keep the Vercel project Root Directory set to `dashboard-ui` and Framework Preset set to Angular. `vercel.json` pins the build command to `npm run build`, installation to `npm ci`, and Output Directory to `dist/dashboard-ui/browser`. It also rewrites client-side routes to `index.html` so direct visits and refreshes of `/login` and `/home` load Angular. Node 24.x is supported; the build must use at least 24.15. After committing these changes, deploy the updated commit to apply the configuration. The development command does not control production hosting.
+
 ## Project structure
 
 Each component has a named folder containing its TypeScript, external HTML template, and unit test. Application data files are grouped centrally:
